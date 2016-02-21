@@ -24,7 +24,6 @@ SOFTWARE.
 #ifndef __SIMPLE_WEB_CORE_HEADER__
 #define __SIMPLE_WEB_CORE_HEADER__
 
-const char* PROGECT_VERSION = "simple web app 1.0"
-
+#define SIMPLE_WEB_VERSION "2016-02-21-1.0"
 
 #endif
