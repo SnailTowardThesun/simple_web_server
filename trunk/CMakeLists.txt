@@ -11,11 +11,23 @@ else( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11  -O2 -pthread -fopenmp")
 endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 
+SET(APP_SOCKET ./src/app/simple_web_app_socket.cpp)
+SET(APP_CONF ./src/app/simple_web_app_conf.cpp)
+SET(APP_LOG ./src/app/simple_web_app_log.cpp)
+SET(APP_FUNCTION ${APP_SOCKET} ${APP_CONF} ${APP_LOG})
+
+SET(APP_CORE ./src/core/simple_web_core.cpp)
+SET(CORE_FUNCTION ${APP_CORE})
+
+SET(KERNEL_FUNCTION)
+
+SET(PROTOCOL_FUNCTION)
+
 SET(SIMPLE_WEB_SERVER_BINARY_DIR "./objs/")
 SET(EXECUTABLE_OUTPUT_PATH ${SIMPLE_WEB_SERVER_BINARY_DIR})
 SET(LIBRARY_OUTPUT_PATH ${SIMPLE_WEB_SERVER_BINARY_DIR})
 
 SET(SIMPLE_WEB_SERVER "./src/simple_web_server.cpp")
 
-ADD_EXECUTABLE(simple_web_server ${SIMPLE_WEB_SERVER})
+ADD_EXECUTABLE(simple_web_server ${SIMPLE_WEB_SERVER} ${APP_FUNCTION} ${CORE_FUNCTION} ${KERNEL_FUNCTION} ${PROTOCOL_FUNCTION})
 

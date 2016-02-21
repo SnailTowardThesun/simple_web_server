@@ -21,4 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef __SIMPLE_WEB_APP_LOG_HEADER__
+#define __SIMPLE_WEB_APP_LOG_HEADER__
 
+class simple_web_app_log
+{
+public:
+	simple_web_app_log();
+	virtual ~simple_web_app_log();
+};
+
+#endif

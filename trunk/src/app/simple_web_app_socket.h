@@ -21,4 +21,48 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef __SIMPLE_WEB_APP_SOCKET_HEADER__
+#define __SIMPLE_WEB_APP_SOCKET_HEADER__
+#include "../core/simple_web_core.h"
+
+namespace simple_web_socket
+{
+	class BaseSocket
+	{
+	public:
+		BaseSocket();
+		virtual ~BaseSocket();
+	};
+
+	class TCPServerSocket : BaseSocket
+	{
+	public:
+		TCPServerSocket();
+		~TCPServerSocket();
+	};
+
+	class UDPServerSocket : BaseSocket
+	{
+	public:
+		UDPServerSocket();
+		~UDPServerSocket();
+	};
+
+	class TCPClientSocket : BaseSocket
+	{
+	public:
+		TCPClientSocket();
+		~TCPClientSocket();
+	};
+
+	class UDPClientSocket : BaseSocket
+	{
+	public:
+		UDPClientSocket();
+		~UDPClientSocket();
+	};
+};
+
+
+#endif
 
