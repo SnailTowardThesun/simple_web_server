@@ -27,40 +27,40 @@ SOFTWARE.
 
 namespace simple_web_socket
 {
-	class BaseSocket
-	{
-	public:
-		BaseSocket();
-		virtual ~BaseSocket();
-	};
+    class BaseSocket
+    {
+    public:
+        BaseSocket();
+        virtual ~BaseSocket();
+    };
 
-	class TCPServerSocket : BaseSocket
-	{
-	public:
-		TCPServerSocket();
-		~TCPServerSocket();
-	};
+    class TCPServerSocket : BaseSocket
+    {
+    public:
+        TCPServerSocket();
+        ~TCPServerSocket();
+    };
 
-	class UDPServerSocket : BaseSocket
-	{
-	public:
-		UDPServerSocket();
-		~UDPServerSocket();
-	};
+    class UDPServerSocket : BaseSocket
+    {
+    public:
+        UDPServerSocket();
+        ~UDPServerSocket();
+    };
 
-	class TCPClientSocket : BaseSocket
-	{
-	public:
-		TCPClientSocket();
-		~TCPClientSocket();
-	};
+    class TCPClientSocket : BaseSocket
+    {
+    public:
+        TCPClientSocket();
+        ~TCPClientSocket();
+    };
 
-	class UDPClientSocket : BaseSocket
-	{
-	public:
-		UDPClientSocket();
-		~UDPClientSocket();
-	};
+    class UDPClientSocket : BaseSocket
+    {
+    public:
+        UDPClientSocket();
+        ~UDPClientSocket();
+    };
 };
 
 

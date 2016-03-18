@@ -22,10 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <iostream>
-using namespace std;
 
 int main(int argc,char** argv)
 {
-	cout<<"this is simple web server written by ME_HAN_KUN"<<endl;
-	return 0;
+    std::cout<<"this is simple web server written by ME_HAN_KUN"<<std::endl;
+    return 0;
 }

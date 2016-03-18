@@ -33,21 +33,21 @@ SOFTWARE.
 class simple_web_app_log
 {
 public:
-	simple_web_app_log();
-	virtual ~simple_web_app_log();
+    simple_web_app_log();
+    virtual ~simple_web_app_log();
 public:
-	static simple_web_app_log* getInstance();
-	static simple_web_app_log* pInstance;
+    static simple_web_app_log* getInstance();
+    static simple_web_app_log* pInstance;
 
 private:
-	std::string log_file_name;
-	char* log_data;
-	int log_file_handle;
+    std::string log_file_name;
+    char* log_data;
+    int log_file_handle;
 protected:
-	bool generate_header(const std::string tag,int context_id, const std::string level_name, int& header_size);
+    bool generate_header(const std::string tag,int context_id, const std::string level_name, int& header_size);
 public:
-	void setLogFile(const std::string strLogFileName);
-	int32_t log(std::string level_name, std::string tag, const char *fmt);
+    void setLogFile(const std::string strLogFileName);
+    int32_t log(std::string level_name, std::string tag, const char *fmt);
 };
 
 #endif
