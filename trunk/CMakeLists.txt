@@ -5,23 +5,27 @@ PROJECT(SIMPLE_WEB_SERVER)
 SET(CMAKE_BUILD_TYPE Debug)
 
 if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -Wall -Wno-unused-variable  -fpermissive")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -g -Wall -Wno-unused-variable  -fpermissive")
 else( CMAKE_BUILD_TYPE STREQUAL "Debug" )
     set(CMAKE_BUILD_TYPE "Release")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O2  -fopenmp")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2  -fopenmp")
 endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 
 SET(APP_SOCKET ./src/app/simple_web_app_socket.cpp)
 SET(APP_CONF ./src/app/simple_web_app_conf.cpp)
 SET(APP_LOG ./src/app/simple_web_app_log.cpp)
-SET(APP_FUNCTION ${APP_SOCKET} ${APP_CONF} ${APP_LOG})
+SET(APP_THREAD ./src/app/simple_web_app_thread.h ./src/app/simple_web_app_thread.cpp)
+SET(APP_FUNCTION ${APP_SOCKET} ${APP_CONF} ${APP_LOG} ${APP_THREAD})
 
 SET(APP_CORE ./src/core/simple_web_core.h)
-SET(CORE_FUNCTION ${APP_CORE})
+SET(CORE_BUFFER ./src/core/simple_web_core_buffer.h ./src/core/simple_web_core_buffer.cpp)
+SET(CORE_FUNCTION ${APP_CORE} ${CORE_BUFFER})
 
-SET(KERNEL_FUNCTION src/kernel/simple_web_kernel_http_server.cpp src/kernel/simple_web_kernel_http_server.h)
+SET(KERNEL_HTTP_SERVER src/kernel/simple_web_kernel_http_server.cpp src/kernel/simple_web_kernel_http_server.h)
+SET(KERNEL_FUNCTION ${KERNEL_HTTP_SERVER})
 
-SET(PROTOCOL_FUNCTION)
+SET(PROTOCOL_HTTP ./src/protocol/simple_web_protocol_http.h ./src/protocol/simple_web_protocol_http.cpp)
+SET(PROTOCOL_FUNCTION ${PROTOCOL_HTTP})
 
 SET(SIMPLE_WEB_SERVER_BINARY_DIR "./objs/")
 SET(EXECUTABLE_OUTPUT_PATH ${SIMPLE_WEB_SERVER_BINARY_DIR})

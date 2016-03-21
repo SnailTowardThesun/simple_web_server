@@ -59,6 +59,7 @@ namespace simple_web_http
         simple_web_protocol_http_response response_;
     public:
         bool deal_with_request(std::string request);
+        bool deal_with_response(std::string response);
     };
 }
 

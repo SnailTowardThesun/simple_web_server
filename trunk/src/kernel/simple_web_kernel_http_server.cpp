@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "simple_web_kernel_http_server.h"
-
+#include "../protocol/simple_web_protocol_http.h"
 simple_web_kernel_http_server::simple_web_kernel_http_server():p_socket_(NULL)
 {
     p_socket_ = new simple_web_socket::TCPServerSock();
@@ -31,6 +31,18 @@ simple_web_kernel_http_server::simple_web_kernel_http_server():p_socket_(NULL)
 simple_web_kernel_http_server::~simple_web_kernel_http_server()
 {
     if(p_socket_ != NULL) delete p_socket_;
+}
+
+void* simple_web_kernel_http_server::recv_thread(void* pParam)
+{
+    simple_web_socket::HTTPTCPConnSock* sock = (simple_web_socket::HTTPTCPConnSock*)pParam;
+    simple_web_http::simple_web_protocol_http http;
+    // recv the client's request
+    std::string http_request;
+    while(sock->get_http_header_message(http_request)) {
+        if(!http.deal_with_request(http_request)) break;
+    }
+    return 0;
 }
 
 int simple_web_kernel_http_server::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
@@ -46,10 +58,9 @@ int simple_web_kernel_http_server::initialize(long port = DEFAULT_HTTP_SERVER_PO
 int simple_web_kernel_http_server::loop()
 {
     while(1) {
-        simple_web_socket::TCPConnSock* conn_socket = new simple_web_socket::TCPConnSock(p_socket_->accept_socket());
-        // recv the client's request
-        // decode the request and make up the response
-        // send the response to client
+        simple_web_socket::HTTPTCPConnSock* conn_socket = new simple_web_socket::HTTPTCPConnSock(p_socket_->accept_socket());
+        pthread_t thread;
+        pthread_create(&thread,NULL,recv_thread,(void*)conn_socket);
     }
     return RESULT_OK;
 }

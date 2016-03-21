@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include "../app/simple_web_app_socket.h"
+#include <pthread.h>
 
 static const long DEFAULT_HTTP_SERVER_PORT = 8080;
 class simple_web_kernel_http_server
@@ -38,6 +39,7 @@ private:
 public:
     int initialize(long port);
     int loop();
+    static void* recv_thread(void* pParam);
 };
 
 #endif //SIMPLE_WEB_SERVER_SIMPLE_WEB_KERNEL_HTTP_SERVER_H

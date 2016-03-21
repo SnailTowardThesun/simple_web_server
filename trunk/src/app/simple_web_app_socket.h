@@ -24,6 +24,7 @@ SOFTWARE.
 #ifndef __SIMPLE_WEB_APP_SOCKET_HEADER__
 #define __SIMPLE_WEB_APP_SOCKET_HEADER__
 #include "../core/simple_web_core.h"
+#include "../core/simple_web_core_buffer.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -55,16 +56,17 @@ namespace simple_web_socket
         int accept_socket();
     };
 
-    class TCPConnSock:BaseSocket
+    class HTTPTCPConnSock:BaseSocket,simple_web_core_buffer
     {
     public:
-        TCPConnSock();
-        TCPConnSock(int sock);
-        virtual ~TCPConnSock();
+        HTTPTCPConnSock();
+        HTTPTCPConnSock(int sock);
+        virtual ~HTTPTCPConnSock();
     private:
         int conn_socket_;
     public:
         int initialize(std::string ip, long port);
+        bool get_http_header_message(std::string& message);
     };
 };
 

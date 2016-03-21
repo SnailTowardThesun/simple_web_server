@@ -21,7 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #include "simple_web_app_socket.h"
 using namespace simple_web_socket;
 
@@ -88,17 +87,37 @@ int TCPServerSock::accept_socket()
     return conn_socket;
 }
 
-TCPConnSock::TCPConnSock():conn_socket_(-1)
+HTTPTCPConnSock::HTTPTCPConnSock():conn_socket_(-1)
 {
 
 }
 
-TCPConnSock::TCPConnSock(int sock):conn_socket_(sock)
+HTTPTCPConnSock::HTTPTCPConnSock(int sock):conn_socket_(sock)
 {
 
 }
 
-TCPConnSock::~TCPConnSock()
+HTTPTCPConnSock::~HTTPTCPConnSock()
 {
 
+}
+
+int HTTPTCPConnSock::initialize(std::string ip, long port)
+{
+    if(!ip.empty()){
+        simple_web_app_log::log("trace","simple_web_app_socket.cpp","the ip is not empty");
+    }
+    if(port < 1) {
+        simple_web_app_log::log("help","simple_web_app_sokcet.cpp","the port is illegal");
+        return false;
+    }
+    return 0;
+}
+
+bool HTTPTCPConnSock::get_http_header_message(std::string& message)
+{
+    message.clear();
+
+    message = buffer_;
+    return true;
 }
