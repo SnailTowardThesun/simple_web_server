@@ -31,5 +31,7 @@ SOFTWARE.
 #include <string>
 #include <vector>
 #include "../app/simple_web_app_log.h"
-
+// common veriable
+static const long RESULT_OK = 0;
+static const long RESULT_ERROR = 1;
 #endif

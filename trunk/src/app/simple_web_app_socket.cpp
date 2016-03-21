@@ -22,3 +22,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "simple_web_app_socket.h"
+using namespace simple_web_socket;
+
+BaseSocket::BaseSocket()
+{
+
+}
+
+BaseSocket::~BaseSocket()
+{
+
+}
+
+TCPServerSock::TCPServerSock() : server_socket_(-1),
+    host_port_(0)
+{
+
+}
+
+TCPServerSock::~TCPServerSock()
+{
+
+}
+
+int TCPServerSock::initialize(std::string ip, long port)
+{
+    if(port < 1) {
+        simple_web_app_log::log("help","simple_web_app_socket.cpp","the port is illegal");
+        return RESULT_ERROR;
+    }
+    if(!ip.empty()){
+        simple_web_app_log::log("trace","simple_web_app_socket.cpp","the ip is not empty");
+    }
+    host_port_ = port;
+
+    // initialize the socket
+    server_socket_ = socket(AF_INET,SOCK_STREAM,0);
+    if(server_socket_ == -1) {
+        simple_web_app_log::log("error","simple_web_app_sock.cpp","fail to initialize the server socket");
+        return RESULT_ERROR;
+    }
+    // local addr
+    struct sockaddr_in name;
+    name.sin_family = AF_INET;
+    name.sin_port = htons(host_port_);
+    name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
+    // bind the socket
+    if(bind(server_socket_,(const sockaddr*)&name,sizeof(name)) < 0) {
+        simple_web_app_log::log("error","simple_web_add_sock.cpp","fail to bind the socket");
+        return RESULT_ERROR;
+    }
+    // begin to listen
+    if(listen(server_socket_, MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET) < 0) {
+        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to listen");
+        return RESULT_ERROR;
+    }
+    return RESULT_OK;
+}

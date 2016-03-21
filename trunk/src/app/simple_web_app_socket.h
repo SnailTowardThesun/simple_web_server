@@ -24,42 +24,34 @@ SOFTWARE.
 #ifndef __SIMPLE_WEB_APP_SOCKET_HEADER__
 #define __SIMPLE_WEB_APP_SOCKET_HEADER__
 #include "../core/simple_web_core.h"
-
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <csignal>
 namespace simple_web_socket
 {
+    static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
     class BaseSocket
     {
     public:
         BaseSocket();
         virtual ~BaseSocket();
+    public:
+        virtual int initialize(std::string ip, long port) = 0;
     };
 
-    class TCPServerSocket : BaseSocket
+    class TCPServerSock:BaseSocket
     {
     public:
-        TCPServerSocket();
-        ~TCPServerSocket();
-    };
-
-    class UDPServerSocket : BaseSocket
-    {
+        TCPServerSock();
+        virtual ~TCPServerSock();
+    private:
+        int server_socket_;
+        long host_port_;
     public:
-        UDPServerSocket();
-        ~UDPServerSocket();
-    };
-
-    class TCPClientSocket : BaseSocket
-    {
-    public:
-        TCPClientSocket();
-        ~TCPClientSocket();
-    };
-
-    class UDPClientSocket : BaseSocket
-    {
-    public:
-        UDPClientSocket();
-        ~UDPClientSocket();
+        int initialize(std::string ip, long port);
     };
 };
 
