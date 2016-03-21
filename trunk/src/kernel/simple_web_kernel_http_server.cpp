@@ -43,12 +43,13 @@ int simple_web_kernel_http_server::initialize(long port = DEFAULT_HTTP_SERVER_PO
     return RESULT_OK;
 }
 
-int simple_web_kernel_http_server::start()
-{
-    return 0;
-}
-
 int simple_web_kernel_http_server::loop()
 {
-    return 0;
+    while(1) {
+        simple_web_socket::TCPConnSock* conn_socket = new simple_web_socket::TCPConnSock(p_socket_->accept_socket());
+        // recv the client's request
+        // decode the request and make up the response
+        // send the response to client
+    }
+    return RESULT_OK;
 }

@@ -80,3 +80,25 @@ int TCPServerSock::initialize(std::string ip, long port)
     }
     return RESULT_OK;
 }
+
+int TCPServerSock::accept_socket()
+{
+    int conn_socket = -1;
+
+    return conn_socket;
+}
+
+TCPConnSock::TCPConnSock():conn_socket_(-1)
+{
+
+}
+
+TCPConnSock::TCPConnSock(int sock):conn_socket_(sock)
+{
+
+}
+
+TCPConnSock::~TCPConnSock()
+{
+
+}

@@ -52,6 +52,19 @@ namespace simple_web_socket
         long host_port_;
     public:
         int initialize(std::string ip, long port);
+        int accept_socket();
+    };
+
+    class TCPConnSock:BaseSocket
+    {
+    public:
+        TCPConnSock();
+        TCPConnSock(int sock);
+        virtual ~TCPConnSock();
+    private:
+        int conn_socket_;
+    public:
+        int initialize(std::string ip, long port);
     };
 };
 

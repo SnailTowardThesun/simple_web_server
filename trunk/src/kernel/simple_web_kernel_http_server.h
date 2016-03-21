@@ -37,7 +37,6 @@ private:
     simple_web_socket::TCPServerSock* p_socket_;
 public:
     int initialize(long port);
-    int start();
     int loop();
 };
 
