@@ -26,4 +26,10 @@ SOFTWARE.
 
 #define SIMPLE_WEB_VERSION "2016-02-21-1.0"
 
+// common header
+#include <iostream>
+#include <string>
+#include <vector>
+#include "../app/simple_web_app_log.h"
+
 #endif

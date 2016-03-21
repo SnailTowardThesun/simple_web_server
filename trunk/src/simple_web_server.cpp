@@ -21,10 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include <iostream>
-
+#include "core/simple_web_core.h"
+#include "kernel/simple_web_kernel_http_server.h"
 int main(int argc,char** argv)
 {
-    std::cout<<"this is simple web server written by ME_HAN_KUN"<<std::endl;
+    simple_web_kernel_http_server http_server;
+    http_server.initialize(8080);
+    if(http_server.start() == 0) {
+        http_server.loop();
+    }
     return 0;
 }

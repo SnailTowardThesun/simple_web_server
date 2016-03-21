@@ -27,42 +27,27 @@ SOFTWARE.
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdarg.h>
-simple_web_app_log* simple_web_app_log::pInstance = nullptr;
 
-simple_web_app_log* simple_web_app_log::getInstance()
-{
-    if(pInstance == nullptr)
-        pInstance = new simple_web_app_log();
-    return pInstance;
-}
-
-simple_web_app_log::simple_web_app_log() : 
+simple_web_app_log::simple_web_app_log() :
     log_file_name(DEFAULT_SIMPLE_WEB_LOG_FILE),
-    log_data(nullptr),
-    log_file_handle(-1)
+    log_data(NULL)
 {
     log_data = new char[LOG_MAX_SIZE];
 }
 
 simple_web_app_log::~simple_web_app_log()
 {
-    if(log_data != nullptr) delete[] log_data;
-    if(log_file_handle > 0) ::close(log_file_handle);
+    if(log_data != NULL) delete[] log_data;
 }
 
-void simple_web_app_log::setLogFile(const std::string strLogFileName)
+int simple_web_app_log::log(std::string level_name, std::string tag, const char *fmt, ...)
 {
-    if(strLogFileName.size() > 0)
-        log_file_name = strLogFileName;
-}
-bool simple_web_app_log::generate_header(const std::string tag,int context_id, const std::string level_name, int& header_size)
-{
-    return true;
-}
-int32_t simple_web_app_log::log(std::string level_name, std::string tag, const char *fmt)
-{
-    int32_t ret = 0;
-
-    return ret;
+    char tmp[LOG_MAX_SIZE];
+    va_list ap;
+    va_start(ap,fmt);
+    vsnprintf(tmp, LOG_MAX_SIZE, (char*)fmt, ap);
+    va_end(ap);
+    std::cout<<"["<<level_name<<"]"<<"["<<tag<<"]"<<tmp<<std::endl;
+    return 0;
 }
 

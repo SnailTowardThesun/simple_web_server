@@ -25,8 +25,8 @@ SOFTWARE.
 #define __SIMPLE_WEB_APP_LOG_HEADER__
 
 #include "../core/simple_web_core.h"
-#include <string>
-
+#include <stdio.h>
+#include <stdarg.h>
 #define DEFAULT_SIMPLE_WEB_LOG_FILE "simple_web.log"
 #define LOG_MAX_SIZE 4096
 
@@ -35,19 +35,11 @@ class simple_web_app_log
 public:
     simple_web_app_log();
     virtual ~simple_web_app_log();
-public:
-    static simple_web_app_log* getInstance();
-    static simple_web_app_log* pInstance;
-
 private:
     std::string log_file_name;
     char* log_data;
-    int log_file_handle;
-protected:
-    bool generate_header(const std::string tag,int context_id, const std::string level_name, int& header_size);
 public:
-    void setLogFile(const std::string strLogFileName);
-    int32_t log(std::string level_name, std::string tag, const char *fmt);
+    static int log(std::string level_name, std::string tag, const char *fmt, ...);
 };
 
 #endif
