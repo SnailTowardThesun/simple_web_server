@@ -23,43 +23,61 @@ SOFTWARE.
 */
 
 #include "simple_web_protocol_http.h"
-using namespace simple_web_http;
+#include "simple_web_protocol_http_common_variabels.h"
+using namespace SimpleWebHttp;
 
-simple_web_protocol_http_request::simple_web_protocol_http_request()
+SimpleWebProtocolHttpRequest::SimpleWebProtocolHttpRequest()
 {
 
 }
 
-simple_web_protocol_http_request::~simple_web_protocol_http_request()
+SimpleWebProtocolHttpRequest::~SimpleWebProtocolHttpRequest()
 {
 
 }
 
-bool simple_web_protocol_http_request::parse_http_request(std::string request)
+bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::string> http_header_list)
+{
+    if(http_header_list.empty()) {
+        simple_web_app_log::log("help","simple_web_core_buffer.cpp","the http header's list is empty");
+        return false;
+    }
+    http_request_map_.clear();
+    for(std::vector<std::string>::iterator it = http_header_list.begin(); it != http_header_list.end(); it++) {
+        std::string header_name,header_content;
+        if(HttpMethod::is_http_method(header_name)) {
+
+        }
+    }
+    return true;
+}
+
+bool SimpleWebProtocolHttpRequest::parse_http_request(std::string request)
 {
     if (request.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the request is empty");
         return false;
     }
+    std::vector<std::string> http_header_list = get_lines(request);
     return true;
 }
 
-bool simple_web_protocol_http_request::make_up_http_request()
+bool SimpleWebProtocolHttpRequest::make_up_http_request()
 {
     return true;
 }
 
-simple_web_protocol_http_response::simple_web_protocol_http_response()
+SimpleWebProtocolHttpResponse::SimpleWebProtocolHttpResponse()
 {
 
 }
 
-simple_web_protocol_http_response::~simple_web_protocol_http_response()
+SimpleWebProtocolHttpResponse::~SimpleWebProtocolHttpResponse()
 {
 
 }
 
-bool simple_web_protocol_http_response::parse_http_response(std::string response)
+bool SimpleWebProtocolHttpResponse::parse_http_response(std::string response)
 {
     if (response.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the response is empty");
@@ -68,31 +86,38 @@ bool simple_web_protocol_http_response::parse_http_response(std::string response
     return true;
 }
 
-bool simple_web_protocol_http_response::make_up_http_response()
+bool SimpleWebProtocolHttpResponse::make_up_http_response()
 {
     return true;
 }
 
-simple_web_protocol_http::simple_web_protocol_http()
+SimpleWebProtocolHttp::SimpleWebProtocolHttp()
 {
 
 }
 
-simple_web_protocol_http::~simple_web_protocol_http()
+SimpleWebProtocolHttp::~SimpleWebProtocolHttp()
 {
 
 }
 
-bool simple_web_protocol_http::deal_with_request(std::string request)
+bool SimpleWebProtocolHttp::deal_with_request(std::string request)
 {
     if (request.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the reques is empty");
         return false;
     }
+    // parse the request
+    if(!request_.parse_http_request(request)) {
+        simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to parse the http request");
+        return false;
+    }
+    // find whether the file is existed
+    // send request
     return true;
 }
 
-bool simple_web_protocol_http::deal_with_response(std::string response)
+bool SimpleWebProtocolHttp::deal_with_response(std::string response)
 {
     if (response.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the response is empty");

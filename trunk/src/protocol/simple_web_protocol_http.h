@@ -27,36 +27,40 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include "../core/simple_web_core_buffer.h"
-namespace simple_web_http
+namespace SimpleWebHttp
 {
-    class simple_web_protocol_http_request:simple_web_core_buffer
+    class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
     {
     public:
-        simple_web_protocol_http_request();
-        virtual ~simple_web_protocol_http_request();
+        SimpleWebProtocolHttpRequest();
+        virtual ~SimpleWebProtocolHttpRequest();
+    private:
+        std::map<std::string,std::string> http_request_map_;
+    protected:
+        bool get_http_request_parts(std::vector<std::string>);
     public:
         bool parse_http_request(std::string request);
         bool make_up_http_request();
     };
 
-    class simple_web_protocol_http_response:simple_web_core_buffer
+    class SimpleWebProtocolHttpResponse:SimpleWebCoreBuffer
     {
     public:
-        simple_web_protocol_http_response();
-        virtual ~simple_web_protocol_http_response();
+        SimpleWebProtocolHttpResponse();
+        virtual ~SimpleWebProtocolHttpResponse();
     public:
         bool parse_http_response(std::string response);
         bool make_up_http_response();
     };
 
-    class simple_web_protocol_http
+    class SimpleWebProtocolHttp
     {
     public:
-        simple_web_protocol_http();
-        virtual ~simple_web_protocol_http();
+        SimpleWebProtocolHttp();
+        virtual ~SimpleWebProtocolHttp();
     private:
-        simple_web_protocol_http_request request_;
-        simple_web_protocol_http_response response_;
+        SimpleWebProtocolHttpRequest request_;
+        SimpleWebProtocolHttpResponse response_;
     public:
         bool deal_with_request(std::string request);
         bool deal_with_response(std::string response);

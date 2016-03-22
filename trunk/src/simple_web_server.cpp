@@ -25,7 +25,7 @@ SOFTWARE.
 #include "kernel/simple_web_kernel_http_server.h"
 int main(int argc,char** argv)
 {
-    simple_web_kernel_http_server http_server;
+    SimpleWebKernelHttpServer http_server;
     if(http_server.initialize(8080) == RESULT_ERROR) return 0;
     http_server.loop();
     return 0;

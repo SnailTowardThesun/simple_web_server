@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "simple_web_app_socket.h"
-using namespace simple_web_socket;
+using namespace SimpleWebSocket;
 
 BaseSocket::BaseSocket()
 {

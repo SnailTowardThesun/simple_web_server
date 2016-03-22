@@ -23,20 +23,20 @@ SOFTWARE.
 */
 #include "simple_web_kernel_http_server.h"
 #include "../protocol/simple_web_protocol_http.h"
-simple_web_kernel_http_server::simple_web_kernel_http_server():p_socket_(NULL)
+SimpleWebKernelHttpServer::SimpleWebKernelHttpServer():p_socket_(NULL)
 {
-    p_socket_ = new simple_web_socket::TCPServerSock();
+    p_socket_ = new SimpleWebSocket::TCPServerSock();
 }
 
-simple_web_kernel_http_server::~simple_web_kernel_http_server()
+SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 {
     if(p_socket_ != NULL) delete p_socket_;
 }
 
-void* simple_web_kernel_http_server::recv_thread(void* pParam)
+void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 {
-    simple_web_socket::HTTPTCPConnSock* sock = (simple_web_socket::HTTPTCPConnSock*)pParam;
-    simple_web_http::simple_web_protocol_http http;
+    SimpleWebSocket::HTTPTCPConnSock* sock = (SimpleWebSocket::HTTPTCPConnSock*)pParam;
+    SimpleWebHttp::SimpleWebProtocolHttp http;
     // recv the client's request
     std::string http_request;
     while(sock->get_http_header_message(http_request)) {
@@ -45,7 +45,7 @@ void* simple_web_kernel_http_server::recv_thread(void* pParam)
     return 0;
 }
 
-int simple_web_kernel_http_server::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
+int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 {
     // initialize the socket
     if(p_socket_->initialize("",port) != RESULT_ERROR) {
@@ -55,10 +55,10 @@ int simple_web_kernel_http_server::initialize(long port = DEFAULT_HTTP_SERVER_PO
     return RESULT_OK;
 }
 
-int simple_web_kernel_http_server::loop()
+int SimpleWebKernelHttpServer::loop()
 {
     while(1) {
-        simple_web_socket::HTTPTCPConnSock* conn_socket = new simple_web_socket::HTTPTCPConnSock(p_socket_->accept_socket());
+        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock(p_socket_->accept_socket());
         pthread_t thread;
         pthread_create(&thread,NULL,recv_thread,(void*)conn_socket);
     }

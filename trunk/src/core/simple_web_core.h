@@ -30,6 +30,7 @@ SOFTWARE.
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "../app/simple_web_app_log.h"
 // common veriable
 static const long RESULT_OK = 0;

@@ -5,7 +5,7 @@ PROJECT(SIMPLE_WEB_SERVER)
 SET(CMAKE_BUILD_TYPE Debug)
 
 if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -g -Wall -Wno-unused-variable  -fpermissive")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -g -Wall -Wno-unused-variable -fpermissive")
 else( CMAKE_BUILD_TYPE STREQUAL "Debug" )
     set(CMAKE_BUILD_TYPE "Release")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O2  -fopenmp")
@@ -34,4 +34,3 @@ SET(LIBRARY_OUTPUT_PATH ${SIMPLE_WEB_SERVER_BINARY_DIR})
 SET(SIMPLE_WEB_SERVER "./src/simple_web_server.cpp")
 
 ADD_EXECUTABLE(simple_web_server ${SIMPLE_WEB_SERVER} ${APP_FUNCTION} ${CORE_FUNCTION} ${KERNEL_FUNCTION} ${PROTOCOL_FUNCTION})
-

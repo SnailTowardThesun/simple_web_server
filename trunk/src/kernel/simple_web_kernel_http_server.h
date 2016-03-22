@@ -29,13 +29,13 @@ SOFTWARE.
 #include <pthread.h>
 
 static const long DEFAULT_HTTP_SERVER_PORT = 8080;
-class simple_web_kernel_http_server
+class SimpleWebKernelHttpServer
 {
 public:
-    simple_web_kernel_http_server();
-    virtual ~simple_web_kernel_http_server();
+    SimpleWebKernelHttpServer();
+    virtual ~SimpleWebKernelHttpServer();
 private:
-    simple_web_socket::TCPServerSock* p_socket_;
+    SimpleWebSocket::TCPServerSock* p_socket_;
 public:
     int initialize(long port);
     int loop();

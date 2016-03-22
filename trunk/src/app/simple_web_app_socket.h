@@ -31,7 +31,7 @@ SOFTWARE.
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <csignal>
-namespace simple_web_socket
+namespace SimpleWebSocket
 {
     static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
     static const int MAX_LENGHT_READ_FROM_SOCKET = 1024;
@@ -57,7 +57,7 @@ namespace simple_web_socket
         int accept_socket();
     };
 
-    class HTTPTCPConnSock:BaseSocket,simple_web_core_buffer
+    class HTTPTCPConnSock:BaseSocket,SimpleWebCoreBuffer
     {
     public:
         HTTPTCPConnSock();
