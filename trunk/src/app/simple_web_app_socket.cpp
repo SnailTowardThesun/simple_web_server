@@ -117,7 +117,31 @@ int HTTPTCPConnSock::initialize(std::string ip, long port)
 bool HTTPTCPConnSock::get_http_header_message(std::string& message)
 {
     message.clear();
-
+    // end with \r\n\r\n
+    bool isEnd = false;
+    char c = '\0';
+    while(!isEnd) {
+        if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+        buffer_ += c;
+        // if got end
+        if(c == '\r') {
+            if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+            buffer_ += c;
+            if(c == '\n') {
+                if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+                buffer_ += c;
+                if(c == '\r') {
+                    if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+                    buffer_ += c;
+                    if(c == '\n') {
+                        if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+                        buffer_ += c;
+                        isEnd = true;
+                    }
+                }
+            }
+        }
+    }
     message = buffer_;
     return true;
 }

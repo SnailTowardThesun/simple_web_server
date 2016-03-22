@@ -34,6 +34,7 @@ SOFTWARE.
 namespace simple_web_socket
 {
     static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
+    static const int MAX_LENGHT_READ_FROM_SOCKET = 1024;
     class BaseSocket
     {
     public:
