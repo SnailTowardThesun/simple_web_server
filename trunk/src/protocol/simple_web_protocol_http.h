@@ -40,7 +40,7 @@ namespace SimpleWebHttp
         bool get_http_request_parts(std::vector<std::string>);
     public:
         bool parse_http_request(std::string request);
-        bool make_up_http_request();
+        std::string get_info(std::string name);
     };
 
     class SimpleWebProtocolHttpResponse:SimpleWebCoreBuffer
@@ -48,9 +48,14 @@ namespace SimpleWebHttp
     public:
         SimpleWebProtocolHttpResponse();
         virtual ~SimpleWebProtocolHttpResponse();
+    private:
+        std::map<std::string ,std::string> http_response_map_;
+    protected:
+        std::vector<std::string> combine_http_response(std::map<std::string,std::string>);
     public:
         bool parse_http_response(std::string response);
-        bool make_up_http_response();
+        void set_info(std::string name, std::string content);
+        std::string get_http_response();
     };
 
     class SimpleWebProtocolHttp

@@ -58,7 +58,7 @@ std::vector<std::string> SimpleWebCoreBuffer::get_lines(std::string str)
     while(cur_pos < size) {
         std::string str_line;
         size_t size_line = str.find_first_of("\r\n",cur_pos,str.length());
-        if(size_line != std::string::npos) {
+        if(size_line != std::string::npos && size_line != 0) {
             str_line.assign(str,cur_pos,size_line);
             str_list.push_back(str_line);
             cur_pos += size_line + 2;
@@ -67,4 +67,14 @@ std::vector<std::string> SimpleWebCoreBuffer::get_lines(std::string str)
         }
     }
     return str_list;
+}
+
+std::string SimpleWebCoreBuffer::set_line(std::vector<std::string> vec)
+{
+    std::string str;
+    for(std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); it++) {
+        str+=*it + "\r\n";
+    }
+    str+="\r\n";
+    return str;
 }

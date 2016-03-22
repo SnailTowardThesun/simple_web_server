@@ -24,7 +24,7 @@ SET(CORE_FUNCTION ${APP_CORE} ${CORE_BUFFER})
 SET(KERNEL_HTTP_SERVER src/kernel/simple_web_kernel_http_server.cpp src/kernel/simple_web_kernel_http_server.h)
 SET(KERNEL_FUNCTION ${KERNEL_HTTP_SERVER})
 
-SET(PROTOCOL_HTTP ./src/protocol/simple_web_protocol_http.h ./src/protocol/simple_web_protocol_http.cpp)
+SET(PROTOCOL_HTTP ./src/protocol/simple_web_protocol_http.h ./src/protocol/simple_web_protocol_http.cpp ./src/protocol/simple_web_protocol_http_common_variables.h)
 SET(PROTOCOL_FUNCTION ${PROTOCOL_HTTP})
 
 SET(SIMPLE_WEB_SERVER_BINARY_DIR "./objs/")

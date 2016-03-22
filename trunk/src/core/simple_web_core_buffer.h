@@ -35,5 +35,6 @@ public:
     std::string buffer_;
     bool write_into_buffer(const char* data, int data_size);
     std::vector<std::string> get_lines(std::string str);
+    std::string set_line(std::vector<std::string> vec);
 };
 #endif
