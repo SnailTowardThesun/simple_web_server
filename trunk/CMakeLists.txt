@@ -18,11 +18,13 @@ SET(APP_THREAD ./src/app/simple_web_app_thread.h ./src/app/simple_web_app_thread
 SET(APP_FUNCTION ${APP_SOCKET} ${APP_CONF} ${APP_LOG} ${APP_THREAD})
 
 SET(APP_CORE ./src/core/simple_web_core.h)
+SET(CORE_SOURCE ./src/core/simple_web_core_source.h ./src/core/simple_web_core_source.cpp)
 SET(CORE_BUFFER ./src/core/simple_web_core_buffer.h ./src/core/simple_web_core_buffer.cpp)
-SET(CORE_FUNCTION ${APP_CORE} ${CORE_BUFFER})
+SET(CORE_FUNCTION ${APP_CORE} ${CORE_BUFFER} ${CORE_SOURCE})
 
+SET(KERNEL_SOURCE_CONTROL ./src/kernel/simple_web_kernel_sources_control.cpp ./src/kernel/simple_web_kernel_sources_control.h)
 SET(KERNEL_HTTP_SERVER src/kernel/simple_web_kernel_http_server.cpp src/kernel/simple_web_kernel_http_server.h)
-SET(KERNEL_FUNCTION ${KERNEL_HTTP_SERVER})
+SET(KERNEL_FUNCTION ${KERNEL_HTTP_SERVER} ${KERNEL_SOURCE_CONTROL})
 
 SET(PROTOCOL_HTTP ./src/protocol/simple_web_protocol_http.h ./src/protocol/simple_web_protocol_http.cpp ./src/protocol/simple_web_protocol_http_common_variables.h)
 SET(PROTOCOL_FUNCTION ${PROTOCOL_HTTP})

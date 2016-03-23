@@ -24,6 +24,8 @@ SOFTWARE.
 
 #include "simple_web_protocol_http.h"
 #include "simple_web_protocol_http_common_variables.h"
+#include "../kernel/simple_web_kernel_sources_control.h"
+#include "../core/simple_web_core_source.h"
 using namespace SimpleWebHttp;
 
 SimpleWebProtocolHttpRequest::SimpleWebProtocolHttpRequest()
@@ -105,6 +107,8 @@ bool SimpleWebProtocolHttpRequest::parse_http_request(std::string request)
     return get_http_request_parts(get_lines(request));
 }
 
+
+/***********************************************************************************************************/
 SimpleWebProtocolHttpResponse::SimpleWebProtocolHttpResponse()
 {
 
@@ -179,10 +183,13 @@ bool SimpleWebProtocolHttp::deal_with_request(std::string request)
     response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
     response_.set_info(HTTP_RESPONSE_NUM,HTTP_RESPONSE_200);
     response_.set_info("Date: ","Mon,27 Jul 2009 12:28:53 GMT");
-    response_.set_info("Server: ","Simple_Web_Server");
+    response_.set_info("Server: ","Simple_Web_Server_1.0");
     response_.set_info("Content-Type: ","text/plain");
     std::string str_rp = response_.get_http_response();
     simple_web_app_log::log("trace","simple_web_protocol_http.cpp",str_rp.c_str());
+
+    // get the source judging from request
+    SimpleWebCoreSource* source = SimpleWebKernelSourcesCtl::getInstance()->get_source(file);
     return true;
 }
 
