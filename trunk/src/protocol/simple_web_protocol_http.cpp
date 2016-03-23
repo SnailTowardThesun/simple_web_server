@@ -48,6 +48,7 @@ bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
         return false;
     }
     http_request_map_.clear();
+    std::string show_message;
     for(std::vector<std::string>::iterator it = http_header_list.begin(); it != http_header_list.end(); it++) {
         std::string header_name,header_content;
         size_t size = it->find_first_of(" ");
@@ -58,18 +59,37 @@ bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
         if(is_http_method(header_name)) {
             // add method name
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_METHOD,header_name));
+
+            show_message = "get method name "+header_name;
+            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+
             // add the file asked
             size_t cur_size = it->find_first_of(" ",size + 1);
             if(cur_size == std::string::npos) {
                 return false;
             }
-            header_content.assign(*it,size+1,cur_size);
+            header_content.assign(*it,size+1,cur_size - size -1);
+
+            show_message = "get file "+header_content;
+            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_REQUEST_FILE,header_content));
             // add the http version
             header_content.assign(*it,cur_size+1,it->length() - cur_size - 1);
+
+            show_message = "get http version "+header_content;
+            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_VERSION,header_content));
         } else {
+            header_name.assign(*it,0,size);
             header_content.assign(*it,size+1,it->length()-size-1);
+
+            show_message = "get name "+header_name;
+            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            show_message = "get content "+header_content;
+            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+
             http_request_map_.insert(std::pair<std::string,std::string>(header_name,header_content));
         }
     }
@@ -117,7 +137,7 @@ std::vector<std::string> SimpleWebProtocolHttpResponse::combine_http_response(st
     // the rest
     for(std::map<std::string,std::string>::iterator it = response_map.begin(); it != response_map.end(); it++) {
         if(it->first != HTTP_VERSION && it->first != HTTP_RESPONSE_NUM) {
-            vec.push_back(it->second);
+            vec.push_back(it->first + it->second);
         }
     }
     return vec;
@@ -130,6 +150,7 @@ std::string SimpleWebProtocolHttpResponse::get_http_response()
     http_response_map_.clear();
     return response;
 }
+
 /***********************************************************************************************/
 SimpleWebProtocolHttp::SimpleWebProtocolHttp()
 {
@@ -155,6 +176,13 @@ bool SimpleWebProtocolHttp::deal_with_request(std::string request)
     // find whether the file is existed
     std::string file = request_.get_info(HTTP_REQUEST_FILE);
     // send response
+    response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
+    response_.set_info(HTTP_RESPONSE_NUM,HTTP_RESPONSE_200);
+    response_.set_info("Date: ","Mon,27 Jul 2009 12:28:53 GMT");
+    response_.set_info("Server: ","Simple_Web_Server");
+    response_.set_info("Content-Type: ","text/plain");
+    std::string str_rp = response_.get_http_response();
+    simple_web_app_log::log("trace","simple_web_protocol_http.cpp",str_rp.c_str());
     return true;
 }
 

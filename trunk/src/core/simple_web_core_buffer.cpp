@@ -50,18 +50,18 @@ std::vector<std::string> SimpleWebCoreBuffer::get_lines(std::string str)
         simple_web_app_log::log("help","simple_web_core_buffer.cpp","the str is empty");
         return str_list;
     }
-    size_t size = str.find_first_of("\r\n\r\n"),cur_pos = 0;
+    size_t size = str.find_last_of("\r\n\r\n"),cur_pos = 0;
     if(size == std::string::npos) {
         simple_web_app_log::log("help","simple_web_core_buffer.cpp","the str is not end with \r\n\r\n");
         return str_list;
     }
-    while(cur_pos < size) {
+    while(cur_pos < size - 2) {
         std::string str_line;
-        size_t size_line = str.find_first_of("\r\n",cur_pos,str.length());
+        size_t size_line = str.find_first_of("\r\n",cur_pos);
         if(size_line != std::string::npos && size_line != 0) {
-            str_line.assign(str,cur_pos,size_line);
+            str_line.assign(str,cur_pos,size_line - cur_pos);
             str_list.push_back(str_line);
-            cur_pos += size_line + 2;
+            cur_pos = size_line + 2;
         } else {
             break;
         }

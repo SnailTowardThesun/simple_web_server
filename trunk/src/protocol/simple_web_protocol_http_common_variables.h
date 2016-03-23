@@ -29,6 +29,7 @@ SOFTWARE.
 namespace SimpleWebHttp
 {
     static const std::string HTTP_VERSION = "VERSION";
+    static const std::string HTTP_VERSION_1 = "HTTP/1.1";
 
     static const std::string HTTP_METHOD = "METHOD";
     static const std::string HTTP_METHOD_GET = "GET";
