@@ -26,16 +26,18 @@ SOFTWARE.
 #define SIMPLE_WEB_CORE_SOURCE_H
 #include "simple_web_core.h"
 
+static const long MAX_LENGTH_READ_FROM_FILE = 4096;
 // fix: should change it into virtual class. change each method  into virtual function = 0;
 class SimpleWebCoreSource
 {
 public:
     SimpleWebCoreSource();
+    SimpleWebCoreSource(std::string name);
     virtual ~SimpleWebCoreSource();
 private:
     std::string source_name_;
 public:
-    std::string get_string(int size);
+    bool get_file_content(std::string& str, long& size)
 };
 
 #endif

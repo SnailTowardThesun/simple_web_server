@@ -34,7 +34,7 @@ SOFTWARE.
 namespace SimpleWebSocket
 {
     static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
-    static const int MAX_LENGHT_READ_FROM_SOCKET = 1024;
+    static const int MAX_LENGHT_FROM_SOCKET = 1024;
     class BaseSocket
     {
     public:
@@ -68,6 +68,7 @@ namespace SimpleWebSocket
     public:
         int initialize(std::string ip, long port);
         bool get_http_header_message(std::string& message);
+        bool send_msg(std::string msg, long msg_length);
     };
 };
 

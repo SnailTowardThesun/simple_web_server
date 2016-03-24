@@ -143,5 +143,27 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
         }
     }
     message = buffer_;
+    return (!message.empty());
+}
+
+bool HTTPTCPConnSock::send_msg(std::string msg, long msg_length)
+{
+    if(msg.length() < msg_length) {
+        simple_web_app_log::log("help", "simple_web_app_socket.cpp",
+                                "the length of message to be sended is short than the required");
+        return false;
+    }
+    size_t msg_left = (size_t)msg_length, msg_sended_size = 0, msg_to_send_size = 0;
+    std::string msg_to_send;
+    while(msg_left > 0) {
+        msg_to_send_size = msg_left < MAX_LENGHT_FROM_SOCKET ? msg_left :MAX_LENGHT_FROM_SOCKET;
+        msg_to_send.assign(msg,msg_length - msg_sended_size, msg_to_send_size);
+        if((msg_sended_size = send(conn_socket_,msg.c_str(),msg_to_send_size,0)) == 0) {
+            simple_web_app_log::log("error", "simple_web_app_socket.cpp",
+                                    "fail to send one package");
+            return false;
+        }
+        msg_left -= msg_sended_size;
+    }
     return true;
 }

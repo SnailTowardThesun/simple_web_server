@@ -40,7 +40,10 @@ void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
     // recv the client's request
     std::string http_request;
     while(sock->get_http_header_message(http_request)) {
-        if(!http.deal_with_request(http_request)) break;
+        if(http.deal_with_request(http_request) == NULL) {
+            break;
+        }
+        // send the file
     }
     return 0;
 }

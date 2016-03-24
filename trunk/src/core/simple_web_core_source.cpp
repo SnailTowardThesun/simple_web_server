@@ -29,12 +29,18 @@ SimpleWebCoreSource::SimpleWebCoreSource()
 
 }
 
-SimpleWebCoreSource::~SimpleWebCoreSource()
+SimpleWebCoreSource::SimpleWebCoreSource(std::string name):source_name_(name)
 {
-
 }
 
-std::string SimpleWebCoreSource::get_string(int size)
+bool SimpleWebCoreSource::get_file_content(std::string &str, long &size)
 {
-    return "<h1>This is a HTML file</h1>";
+   if(source_name_.empty()) {
+      simple_web_app_log::log("error", "simple_web_core_source.cpp",
+                              "the name of source is empty");
+      return false;
+   }
+   str = "<h1>this is a html file</h1>";
+   size = str.length();
+   return true;
 }

@@ -166,7 +166,7 @@ SimpleWebProtocolHttp::~SimpleWebProtocolHttp()
 
 }
 
-bool SimpleWebProtocolHttp::deal_with_request(std::string request)
+SimpleWebCoreSource* SimpleWebProtocolHttp::deal_with_request(std::string request)
 {
     if (request.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the reques is empty");
@@ -181,16 +181,20 @@ bool SimpleWebProtocolHttp::deal_with_request(std::string request)
     std::string file = request_.get_info(HTTP_REQUEST_FILE);
     // send response
     response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
-    response_.set_info(HTTP_RESPONSE_NUM,HTTP_RESPONSE_200);
-    response_.set_info("Date: ","Mon,27 Jul 2009 12:28:53 GMT");
     response_.set_info("Server: ","Simple_Web_Server_1.0");
     response_.set_info("Content-Type: ","text/plain");
     std::string str_rp = response_.get_http_response();
     simple_web_app_log::log("trace","simple_web_protocol_http.cpp",str_rp.c_str());
-
-    // get the source judging from request
+    // get the source and source's state
+    // now we just judge whether the file is existed
     SimpleWebCoreSource* source = SimpleWebKernelSourcesCtl::getInstance()->get_source(file);
-    return true;
+    if(source != NULL) {
+        response_.set_info(HTTP_RESPONSE_NUM,HTTP_RESPONSE_200);
+    } else {
+        response_.set_info(HTTP_RESPONSE_NUM, HTTP_RESPONSE_404);
+    }
+    // send the response
+    return source;
 }
 
 bool SimpleWebProtocolHttp::deal_with_response(std::string response)

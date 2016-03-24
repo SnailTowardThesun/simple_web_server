@@ -27,8 +27,11 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include "../core/simple_web_core_buffer.h"
+#include "../core/simple_web_core_source.h"
+
 namespace SimpleWebHttp
 {
+    class SimpleWebCoreSource;
     class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
     {
     public:
@@ -67,7 +70,7 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttpRequest request_;
         SimpleWebProtocolHttpResponse response_;
     public:
-        bool deal_with_request(std::string request);
+        SimpleWebCoreSource* deal_with_request(std::string request);
         bool deal_with_response(std::string response);
     };
 }
