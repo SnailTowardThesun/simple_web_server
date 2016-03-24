@@ -28,7 +28,7 @@ SOFTWARE.
 #include "../core/simple_web_core.h"
 #include "../core/simple_web_core_buffer.h"
 #include "../core/simple_web_core_source.h"
-
+#include "../app/simple_web_app_socket.h"
 namespace SimpleWebHttp
 {
     class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
@@ -69,7 +69,7 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttpRequest request_;
         SimpleWebProtocolHttpResponse response_;
     public:
-        SimpleWebCoreSource* deal_with_request(std::string request);
+        bool  deal_with_request(std::string request, SimpleWebSocket::HTTPTCPConnSock* sock);
         bool deal_with_response(std::string response);
     };
 }

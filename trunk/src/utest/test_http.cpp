@@ -41,6 +41,6 @@ void TestHttp::tearDown()
 void TestHttp::testDealWithRequest()
 {
     SimpleWebHttp::SimpleWebProtocolHttp http;
-    request = "GET /live/livestream.m3u8 HTTP/1.1\r\nUser-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.71 zlib/1.2.3\r\nHost: www.example.com\r\nAccept-Language: en,mi\r\n\r\n";
+    request = "GET index.html HTTP/1.1\r\nUser-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.71 zlib/1.2.3\r\nHost: www.example.com\r\nAccept-Language: en,mi\r\n\r\n";
     http.deal_with_request(request);
 }

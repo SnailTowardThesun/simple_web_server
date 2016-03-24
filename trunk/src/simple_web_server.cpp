@@ -23,10 +23,17 @@ SOFTWARE.
 */
 #include "core/simple_web_core.h"
 #include "kernel/simple_web_kernel_http_server.h"
+#include "kernel/simple_web_kernel_sources_control.h"
 int main(int argc,char** argv)
 {
+    // initialize the global varibales
+    if(!SimpleWebKernelSourcesCtl::getInstance()->initialize()) {
+        simple_web_app_log::log("error","simple_web_server.cpp","fail to initialize the SourceCtl part");
+        return -1;
+    }
+    // start a http server
     SimpleWebKernelHttpServer http_server;
-    if(http_server.initialize(8080) == RESULT_ERROR) return 0;
+    if(http_server.initialize(9090) == RESULT_ERROR) return 0;
     http_server.loop();
     return 0;
 }

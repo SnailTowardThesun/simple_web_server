@@ -40,6 +40,7 @@ SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::getInstance()
 {
     if(pInstance_ == NULL) {
         pInstance_ = new SimpleWebKernelSourcesCtl();
+        pInstance_ ->initialize();
     }
     return pInstance_;
 }
@@ -51,4 +52,12 @@ SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
         return NULL;
     }
     return source_list_[file_url];
+}
+
+bool SimpleWebKernelSourcesCtl::initialize()
+{
+    // make a static source as test case
+    SimpleWebCoreSource* pIndex = new SimpleWebCoreSource("/index.html");
+    source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/index.html",pIndex));
+    return true;
 }

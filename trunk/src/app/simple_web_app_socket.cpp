@@ -82,8 +82,9 @@ int TCPServerSock::initialize(std::string ip, long port)
 
 int TCPServerSock::accept_socket()
 {
-    int conn_socket = -1;
-
+    struct sockaddr_in client_name;
+    int conn_socket = -1,client_name_len = sizeof(client_name);
+    conn_socket = accept(server_socket_,(struct sockaddr *)&client_name,(socklen_t*)&client_name_len);
     return conn_socket;
 }
 
@@ -117,30 +118,31 @@ int HTTPTCPConnSock::initialize(std::string ip, long port)
 bool HTTPTCPConnSock::get_http_header_message(std::string& message)
 {
     message.clear();
+    buffer_.clear();
     // end with \r\n\r\n
     bool isEnd = false;
     char c = '\0';
     while(!isEnd) {
-        if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+        if(recv(conn_socket_,&c,1,0) == 0) break;
         buffer_ += c;
         // if got end
         if(c == '\r') {
-            if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+            if(recv(conn_socket_,&c,1,0) == 0) break;
             buffer_ += c;
             if(c == '\n') {
-                if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+                if(recv(conn_socket_,&c,1,0) == 0) break;
                 buffer_ += c;
                 if(c == '\r') {
-                    if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
+                    if(recv(conn_socket_,&c,1,0) == 0) break;
                     buffer_ += c;
                     if(c == '\n') {
-                        if(recv(conn_socket_,&c,1,MSG_PEEK) == 0) break;
                         buffer_ += c;
                         isEnd = true;
                     }
                 }
             }
         }
+        std::cout<<buffer_<<std::endl;
     }
     message = buffer_;
     return (!message.empty());

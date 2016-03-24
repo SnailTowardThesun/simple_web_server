@@ -63,7 +63,7 @@ bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_METHOD,header_name));
 
             show_message = "get method name "+header_name;
-            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            //simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
 
             // add the file asked
             size_t cur_size = it->find_first_of(" ",size + 1);
@@ -73,14 +73,14 @@ bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
             header_content.assign(*it,size+1,cur_size - size -1);
 
             show_message = "get file "+header_content;
-            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            //simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
 
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_REQUEST_FILE,header_content));
             // add the http version
             header_content.assign(*it,cur_size+1,it->length() - cur_size - 1);
 
             show_message = "get http version "+header_content;
-            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            //simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
 
             http_request_map_.insert(std::pair<std::string,std::string>(HTTP_VERSION,header_content));
         } else {
@@ -88,9 +88,9 @@ bool SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
             header_content.assign(*it,size+1,it->length()-size-1);
 
             show_message = "get name "+header_name;
-            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            //simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
             show_message = "get content "+header_content;
-            simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
+            //simple_web_app_log::log("trace","simple_web_protocol_http.cpp",show_message.c_str());
 
             http_request_map_.insert(std::pair<std::string,std::string>(header_name,header_content));
         }
@@ -166,26 +166,28 @@ SimpleWebProtocolHttp::~SimpleWebProtocolHttp()
 
 }
 
-SimpleWebCoreSource* SimpleWebProtocolHttp::deal_with_request(std::string request)
+bool  SimpleWebProtocolHttp::deal_with_request(std::string request, SimpleWebSocket::HTTPTCPConnSock* sock)
 {
     if (request.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the reques is empty");
-        return NULL;
+        return false;
+    }
+    if (sock == NULL) {
+        simple_web_app_log::log("help","simple_web_protocol_http.cpp","the sock is NULL");
+        return false;
     }
     // parse the request
     if(!request_.parse_http_request(request)) {
         simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to parse the http request");
-        return NULL;
+        return false;
     }
     // find whether the file is existed
     std::string file = request_.get_info(HTTP_REQUEST_FILE);
     // send response
     response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
     response_.set_info("Server: ","Simple_Web_Server_1.0");
-    response_.set_info("Content-Type: ","text/plain");
-    std::string str_rp = response_.get_http_response();
-    simple_web_app_log::log("trace","simple_web_protocol_http.cpp",str_rp.c_str());
-    // get the source and source's state
+    response_.set_info("Content-Type: ","text/html");
+       // get the source and source's state
     // now we just judge whether the file is existed
     SimpleWebCoreSource* source = SimpleWebKernelSourcesCtl::getInstance()->get_source(file);
     if(source != NULL) {
@@ -193,8 +195,33 @@ SimpleWebCoreSource* SimpleWebProtocolHttp::deal_with_request(std::string reques
     } else {
         response_.set_info(HTTP_RESPONSE_NUM, HTTP_RESPONSE_404);
     }
+    /*std::string str_rp = response_.get_http_response();
+    if(!sock->send_msg(str_rp,str_rp.size())) {
+        simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
+        return false;
+    }*/
     // send the response
-    return source;
+    std::string str_file;
+    long str_file_size = 0;
+    char size[10] = {0};
+    if(source->get_file_content(str_file, str_file_size)) {
+        sprintf(size,"%ld",str_file_size);
+        response_.set_info("Content-Length: ",size);
+
+        std::string str_rp = response_.get_http_response();
+        simple_web_app_log::log("trace","simple_web_protocol_http.cpp","response is ");
+        std::cout<<str_rp<<std::endl;
+
+        if(!sock->send_msg(str_rp,str_rp.size())) {
+            simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
+            return false;
+        }
+        if(!sock->send_msg(str_file,str_file_size)) {
+            simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
+            return false;
+        }
+    }
+    return true;
 }
 
 bool SimpleWebProtocolHttp::deal_with_response(std::string response)

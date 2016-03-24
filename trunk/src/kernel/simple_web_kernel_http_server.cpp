@@ -40,10 +40,9 @@ void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
     // recv the client's request
     std::string http_request;
     while(sock->get_http_header_message(http_request)) {
-        if(http.deal_with_request(http_request) == NULL) {
+        if(!http.deal_with_request(http_request,sock)) {
             break;
         }
-        // send the file
     }
     return 0;
 }
@@ -51,7 +50,7 @@ void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 {
     // initialize the socket
-    if(p_socket_->initialize("",port) != RESULT_ERROR) {
+    if(p_socket_->initialize("",port) == RESULT_ERROR) {
         simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
         return RESULT_ERROR;
     }
@@ -60,10 +59,27 @@ int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 
 int SimpleWebKernelHttpServer::loop()
 {
+    int sock_client = 0;
     while(1) {
-        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock(p_socket_->accept_socket());
+        if((sock_client = p_socket_->accept_socket()) == -1) {
+            sleep(1);
+            continue;
+        }
+        SimpleWebSocket::HTTPTCPConnSock* sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
+        SimpleWebHttp::SimpleWebProtocolHttp http;
+        // recv the client's request
+        std::string http_request;
+        while(sock->get_http_header_message(http_request)) {
+            if(!http.deal_with_request(http_request,sock)) {
+                break;
+            }
+        }
+        delete sock;
+        /*
+        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock();
         pthread_t thread;
         pthread_create(&thread,NULL,recv_thread,(void*)conn_socket);
+        */
     }
     return RESULT_OK;
 }
