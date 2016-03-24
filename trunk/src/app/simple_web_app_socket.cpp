@@ -148,7 +148,7 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
 
 bool HTTPTCPConnSock::send_msg(std::string msg, long msg_length)
 {
-    if(msg.length() < msg_length) {
+    if(msg.length() < (size_t)msg_length) {
         simple_web_app_log::log("help", "simple_web_app_socket.cpp",
                                 "the length of message to be sended is short than the required");
         return false;

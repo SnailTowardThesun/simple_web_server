@@ -37,7 +37,7 @@ public:
 private:
     std::string source_name_;
 public:
-    bool get_file_content(std::string& str, long& size)
+    bool get_file_content(std::string& str, long& size);
 };
 
 #endif

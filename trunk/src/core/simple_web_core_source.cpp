@@ -29,6 +29,11 @@ SimpleWebCoreSource::SimpleWebCoreSource()
 
 }
 
+SimpleWebCoreSource::~SimpleWebCoreSource()
+{
+
+}
+
 SimpleWebCoreSource::SimpleWebCoreSource(std::string name):source_name_(name)
 {
 }

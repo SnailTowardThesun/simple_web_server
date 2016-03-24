@@ -31,7 +31,6 @@ SOFTWARE.
 
 namespace SimpleWebHttp
 {
-    class SimpleWebCoreSource;
     class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
     {
     public:

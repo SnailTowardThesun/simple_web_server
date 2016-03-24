@@ -170,12 +170,12 @@ SimpleWebCoreSource* SimpleWebProtocolHttp::deal_with_request(std::string reques
 {
     if (request.empty()) {
         simple_web_app_log::log("help","simple_web_protocol_http.cpp","the reques is empty");
-        return false;
+        return NULL;
     }
     // parse the request
     if(!request_.parse_http_request(request)) {
         simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to parse the http request");
-        return false;
+        return NULL;
     }
     // find whether the file is existed
     std::string file = request_.get_info(HTTP_REQUEST_FILE);
