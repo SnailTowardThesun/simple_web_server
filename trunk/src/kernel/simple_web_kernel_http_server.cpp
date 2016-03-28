@@ -35,6 +35,7 @@ SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 
 void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 {
+    simple_web_app_log::log("trace", "simple_web_kernel_http_server.cpp", "get one connection");
     SimpleWebSocket::HTTPTCPConnSock* sock = (SimpleWebSocket::HTTPTCPConnSock*)pParam;
     SimpleWebHttp::SimpleWebProtocolHttp http;
     // recv the client's request
@@ -65,6 +66,7 @@ int SimpleWebKernelHttpServer::loop()
             sleep(1);
             continue;
         }
+        /*
         SimpleWebSocket::HTTPTCPConnSock* sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
         SimpleWebHttp::SimpleWebProtocolHttp http;
         // recv the client's request
@@ -75,11 +77,10 @@ int SimpleWebKernelHttpServer::loop()
             }
         }
         delete sock;
-        /*
-        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock();
+        */
+        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
         pthread_t thread;
         pthread_create(&thread,NULL,recv_thread,(void*)conn_socket);
-        */
     }
     return RESULT_OK;
 }

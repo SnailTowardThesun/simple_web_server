@@ -183,28 +183,25 @@ bool  SimpleWebProtocolHttp::deal_with_request(std::string request, SimpleWebSoc
     }
     // find whether the file is existed
     std::string file = request_.get_info(HTTP_REQUEST_FILE);
-    // send response
-    response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
-    response_.set_info("Server: ","Simple_Web_Server_1.0");
-    response_.set_info("Content-Type: ","text/html");
-       // get the source and source's state
-    // now we just judge whether the file is existed
+
+    // get the source and source's state
+    // fix:now we just judge whether the file is existed
     SimpleWebCoreSource* source = SimpleWebKernelSourcesCtl::getInstance()->get_source(file);
     if(source != NULL) {
         response_.set_info(HTTP_RESPONSE_NUM,HTTP_RESPONSE_200);
     } else {
+        source = SimpleWebKernelSourcesCtl::getInstance()->get_source("/404.html");
         response_.set_info(HTTP_RESPONSE_NUM, HTTP_RESPONSE_404);
     }
-    /*std::string str_rp = response_.get_http_response();
-    if(!sock->send_msg(str_rp,str_rp.size())) {
-        simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
-        return false;
-    }*/
     // send the response
+    response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
+    response_.set_info("Server: ","Simple_Web_Server_1.0");
+    response_.set_info("Content-Type: ","text/html");
+
     std::string str_file;
     long str_file_size = 0;
     char size[10] = {0};
-    if(source->get_file_content(str_file, str_file_size)) {
+    if(source->get_file_content(str_file, str_file_size) == RESULT_OK) {
         sprintf(size,"%ld",str_file_size);
         response_.set_info("Content-Length: ",size);
 

@@ -21,5 +21,20 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_core_source.h"
+#ifndef SIMPLE_WEB_APP_SOURCE_FILE_H
+#define SIMPLE_WEB_APP_SOURCE_FILE_H
 
+#include "../core/simple_web_core.h"
+#include "../core/simple_web_core_source.h"
+
+class SimpleWebAppSourceFile:public SimpleWebCoreSource
+{
+public:
+    SimpleWebAppSourceFile();
+    virtual ~SimpleWebAppSourceFile();
+public:
+    virtual int initialize(std::string source_name, std::string url);
+    virtual int get_file_content(std::string& str, long& size);
+};
+
+#endif

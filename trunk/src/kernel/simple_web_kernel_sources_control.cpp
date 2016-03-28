@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "simple_web_kernel_sources_control.h"
+#include "../app/simple_web_app_source_file.h"
 #include "../core/simple_web_core_source.h"
 SimpleWebKernelSourcesCtl::SimpleWebKernelSourcesCtl()
 {
@@ -40,7 +41,6 @@ SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::getInstance()
 {
     if(pInstance_ == NULL) {
         pInstance_ = new SimpleWebKernelSourcesCtl();
-        pInstance_ ->initialize();
     }
     return pInstance_;
 }
@@ -57,7 +57,13 @@ SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
 bool SimpleWebKernelSourcesCtl::initialize()
 {
     // make a static source as test case
-    SimpleWebCoreSource* pIndex = new SimpleWebCoreSource("/index.html");
+    SimpleWebCoreSource* pIndex = new SimpleWebAppSourceFile();
+    pIndex->initialize("/index.html", "");
     source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/index.html",pIndex));
+    // add the http protocol source like 404,500 etc.
+    SimpleWebCoreSource* p404Index = new SimpleWebAppSourceFile();
+    p404Index->initialize("/404.html", "");
+    source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/404.html",p404Index));
+
     return true;
 }

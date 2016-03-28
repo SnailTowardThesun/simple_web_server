@@ -31,13 +31,13 @@ static const long MAX_LENGTH_READ_FROM_FILE = 4096;
 class SimpleWebCoreSource
 {
 public:
-    SimpleWebCoreSource();
-    SimpleWebCoreSource(std::string name);
-    virtual ~SimpleWebCoreSource();
-private:
-    std::string source_name_;
+    SimpleWebCoreSource(){};
+    virtual ~SimpleWebCoreSource(){};
 public:
-    bool get_file_content(std::string& str, long& size);
+    std::string source_name_;
+
+    virtual int initialize(std::string source_name, std::string url) = 0;
+    virtual int get_file_content(std::string& str, long& size) = 0;
 };
 
 #endif

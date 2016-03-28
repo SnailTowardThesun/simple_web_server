@@ -142,7 +142,6 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
                 }
             }
         }
-        std::cout<<buffer_<<std::endl;
     }
     message = buffer_;
     return (!message.empty());
