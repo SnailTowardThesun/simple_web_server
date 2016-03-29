@@ -209,11 +209,11 @@ bool  SimpleWebProtocolHttp::deal_with_request(std::string request, SimpleWebSoc
         simple_web_app_log::log("trace","simple_web_protocol_http.cpp","response is ");
         std::cout<<str_rp<<std::endl;
 
-        if(!sock->send_msg(str_rp,str_rp.size())) {
+        if(!sock->write(str_rp,str_rp.size())) {
             simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
             return false;
         }
-        if(!sock->send_msg(str_file,str_file_size)) {
+        if(!sock->write(str_file,str_file_size)) {
             simple_web_app_log::log("error","simple_web_protocol_http.cpp","fail to send the response header");
             return false;
         }

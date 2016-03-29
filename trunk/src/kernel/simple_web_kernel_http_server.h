@@ -26,16 +26,35 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include "../app/simple_web_app_socket.h"
+
+
+#ifdef USING_ST
+#include <st.h>
+#else
 #include <pthread.h>
+#endif
 
 static const long DEFAULT_HTTP_SERVER_PORT = 8080;
+static const long MAX_BIND_ADDR = 16;
+static const long MAX_THREAD = 8;
 class SimpleWebKernelHttpServer
 {
+#ifdef USING_ST
+    struct socket_info{
+        //st_netfd_t nfd;
+        SimpleWebSocket::TCPServerSock* sock;
+        char *addr;
+        unsigned int port;
+        int wait_threads;
+        int busy_threads;
+        int rqst;
+    }srv_socket;
+#endif
 public:
     SimpleWebKernelHttpServer();
     virtual ~SimpleWebKernelHttpServer();
 private:
-    SimpleWebSocket::TCPServerSock* p_socket_;
+    //SimpleWebSocket::TCPServerSock* p_socket_;
 public:
     int initialize(long port);
     int loop();

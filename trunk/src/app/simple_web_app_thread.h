@@ -25,12 +25,20 @@ SOFTWARE.
 #define SIMPLE_WEB_APP_THREAD_H
 
 #include "../core/simple_web_core.h"
-
-class simple_web_app_thread
+#include <st.h>
+class SimpleWebAppThread
 {
 public:
-    simple_web_app_thread();
-    virtual ~simple_web_app_thread();
+    SimpleWebAppThread();
+    virtual ~SimpleWebAppThread();
+private:
+    st_thread_t tid;
+public:
+    virtual long start();
+    virtual long stop();
+protected:
+    virtual void thread_cycle();
+    static void* thread_func(void* param);
 };
 
 #endif

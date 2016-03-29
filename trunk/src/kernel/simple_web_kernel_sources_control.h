@@ -43,7 +43,7 @@ public:
 private:
     std::map<std::string,SimpleWebCoreSource*> source_list_;
 public:
-    bool initialize();
+    long initialize();
     SimpleWebCoreSource* get_source(std::string file_url);
 };
 

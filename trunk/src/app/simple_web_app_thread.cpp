@@ -23,13 +23,49 @@ SOFTWARE.
 */
 
 #include "simple_web_app_thread.h"
+static const long DEFAULT_MAX_THREADS = 4;
 
-simple_web_app_thread::simple_web_app_thread()
+SimpleWebAppThread::SimpleWebAppThread():tid(NULL)
 {
 
 }
 
-simple_web_app_thread::~simple_web_app_thread()
+SimpleWebAppThread::~SimpleWebAppThread()
 {
 
+}
+
+long SimpleWebAppThread::start()
+{
+    // start
+    if (tid != NULL) {
+        simple_web_app_log::log("warning", "simpe_web_app_thread.cpp", "the thread is running");
+        return RESULT_ERROR;
+    }
+    if ((tid = st_thread_create(thread_func, this, 0, 0)) == NULL) {
+        simple_web_app_log::log("error", "simpe_web_app_thread.cpp", "st create thread failed");
+        return RESULT_ERROR;
+    }
+    return RESULT_OK;
+}
+
+long SimpleWebAppThread::stop()
+{
+    if (tid != NULL) {
+    }
+    tid = NULL;
+    return RESULT_OK;
+}
+
+void* SimpleWebAppThread::thread_func(void* param)
+{
+    // base class just show a log
+    SimpleWebAppThread *pC = (SimpleWebAppThread*)param;
+    pC->thread_cycle();
+    return NULL;
+}
+
+void SimpleWebAppThread::thread_cycle()
+{
+    simple_web_app_log::log("trace", "simpe_web_app_thread.cpp", "step into base thread class's thread");
 }

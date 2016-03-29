@@ -54,7 +54,7 @@ SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
     return source_list_[file_url];
 }
 
-bool SimpleWebKernelSourcesCtl::initialize()
+long SimpleWebKernelSourcesCtl::initialize()
 {
     // make a static source as test case
     SimpleWebCoreSource* pIndex = new SimpleWebAppSourceFile();
@@ -65,5 +65,5 @@ bool SimpleWebKernelSourcesCtl::initialize()
     p404Index->initialize("/404.html", "");
     source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/404.html",p404Index));
 
-    return true;
+    return RESULT_OK;
 }

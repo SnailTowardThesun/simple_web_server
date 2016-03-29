@@ -34,8 +34,8 @@ BaseSocket::~BaseSocket()
 
 }
 
-TCPServerSock::TCPServerSock() : server_socket_(-1),
-    host_port_(0)
+TCPServerSock::TCPServerSock() : host_port_(0),
+    st_nfd_(NULL)
 {
 
 }
@@ -57,7 +57,7 @@ int TCPServerSock::initialize(std::string ip, long port)
     host_port_ = port;
 
     // initialize the socket
-    server_socket_ = socket(AF_INET,SOCK_STREAM,0);
+    int server_socket_ = socket(AF_INET,SOCK_STREAM,0);
     if(server_socket_ == -1) {
         simple_web_app_log::log("error","simple_web_app_sock.cpp","fail to initialize the server socket");
         return RESULT_ERROR;
@@ -77,23 +77,27 @@ int TCPServerSock::initialize(std::string ip, long port)
         simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to listen");
         return RESULT_ERROR;
     }
+    if ((st_nfd_ = st_netfd_open(server_socket_)) == NULL) {
+        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to open st netfd");
+        return RESULT_ERROR;
+    }
     return RESULT_OK;
 }
 
-int TCPServerSock::accept_socket()
+st_netfd_t TCPServerSock::accept_socket()
 {
     struct sockaddr_in client_name;
-    int conn_socket = -1,client_name_len = sizeof(client_name);
-    conn_socket = accept(server_socket_,(struct sockaddr *)&client_name,(socklen_t*)&client_name_len);
+    int client_name_len = sizeof(client_name);
+    st_netfd_t conn_socket = st_accept(st_nfd_, (struct sockaddr *)&client_name, &client_name_len, ST_UTIME_NO_TIMEOUT);
     return conn_socket;
 }
 
-HTTPTCPConnSock::HTTPTCPConnSock():conn_socket_(-1)
+HTTPTCPConnSock::HTTPTCPConnSock():conn_socket_(NULL)
 {
 
 }
 
-HTTPTCPConnSock::HTTPTCPConnSock(int sock):conn_socket_(sock)
+HTTPTCPConnSock::HTTPTCPConnSock(st_netfd_t sock):conn_socket_(sock)
 {
 
 }
@@ -110,9 +114,9 @@ int HTTPTCPConnSock::initialize(std::string ip, long port)
     }
     if(port < 1) {
         simple_web_app_log::log("help","simple_web_app_sokcet.cpp","the port is illegal");
-        return false;
+        return RESULT_ERROR;
     }
-    return 0;
+    return RESULT_OK;
 }
 
 bool HTTPTCPConnSock::get_http_header_message(std::string& message)
@@ -123,17 +127,17 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
     bool isEnd = false;
     char c = '\0';
     while(!isEnd) {
-        if(recv(conn_socket_,&c,1,0) == 0) break;
+        if(st_read(conn_socket_,&c,1,1000) == 0) break;
         buffer_ += c;
-        // if got end
+        // if got \n
         if(c == '\r') {
-            if(recv(conn_socket_,&c,1,0) == 0) break;
+            if(st_read(conn_socket_,&c,1,1000) == 0) break;
             buffer_ += c;
             if(c == '\n') {
-                if(recv(conn_socket_,&c,1,0) == 0) break;
+                if(st_read(conn_socket_,&c,1,1000) == 0) break;
                 buffer_ += c;
                 if(c == '\r') {
-                    if(recv(conn_socket_,&c,1,0) == 0) break;
+                    if(st_read(conn_socket_,&c,1,1000) == 0) break;
                     buffer_ += c;
                     if(c == '\n') {
                         buffer_ += c;
@@ -146,7 +150,7 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
     message = buffer_;
     return (!message.empty());
 }
-
+/*
 bool HTTPTCPConnSock::send_msg(std::string msg, long msg_length)
 {
     if(msg.length() < (size_t)msg_length) {
@@ -167,4 +171,15 @@ bool HTTPTCPConnSock::send_msg(std::string msg, long msg_length)
         msg_left -= msg_sended_size;
     }
     return true;
+}
+*/
+int HTTPTCPConnSock::read(std::string buf, int size)
+{
+    int ret = 0;
+    return ret;
+}
+
+int HTTPTCPConnSock::write(std::string buf, int size)
+{
+    return st_write(conn_socket_, buf.c_str(), size, ST_UTIME_NO_TIMEOUT);
 }

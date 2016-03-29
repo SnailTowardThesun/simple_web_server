@@ -31,8 +31,11 @@ SOFTWARE.
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <csignal>
+
+#include <st.h>
 namespace SimpleWebSocket
 {
+    // using state thread
     static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
     static const int MAX_LENGHT_FROM_SOCKET = 1024;
     class BaseSocket
@@ -50,25 +53,28 @@ namespace SimpleWebSocket
         TCPServerSock();
         virtual ~TCPServerSock();
     private:
-        int server_socket_;
+        //int server_socket_;
         long host_port_;
+        st_netfd_t st_nfd_;
     public:
         int initialize(std::string ip, long port);
-        int accept_socket();
+        st_netfd_t accept_socket();
     };
 
     class HTTPTCPConnSock:BaseSocket,SimpleWebCoreBuffer
     {
     public:
         HTTPTCPConnSock();
-        HTTPTCPConnSock(int sock);
+        HTTPTCPConnSock(st_netfd_t sock);
         virtual ~HTTPTCPConnSock();
     private:
-        int conn_socket_;
+        st_netfd_t conn_socket_;
     public:
         int initialize(std::string ip, long port);
         bool get_http_header_message(std::string& message);
-        bool send_msg(std::string msg, long msg_length);
+        //bool send_msg(std::string msg, long msg_length);
+        virtual int read(std::string buf, int size);
+        virtual int write(std::string buf, int size);
     };
 };
 
