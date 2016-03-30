@@ -81,6 +81,10 @@ int TCPServerSock::initialize(std::string ip, long port)
         simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to open st netfd");
         return RESULT_ERROR;
     }
+    if (st_netfd_serialize_accept(st_nfd_) < 0) {
+        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to accept");
+        return RESULT_ERROR;
+    }
     return RESULT_OK;
 }
 
