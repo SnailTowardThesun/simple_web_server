@@ -106,9 +106,28 @@ HTTPTCPConnSock::HTTPTCPConnSock(st_netfd_t sock):conn_socket_(sock)
 
 }
 
+int HTTPTCPConnSock::set_sock(st_netfd_t sock)
+{
+   if (conn_socket_ != NULL) {
+       st_netfd_close(conn_socket_);
+   }
+    conn_socket_ = sock;
+    return RESULT_OK;
+}
+
+int HTTPTCPConnSock::close_sock()
+{
+    if(conn_socket_ != NULL) {
+        st_netfd_close(conn_socket_);
+        conn_socket_ = NULL;
+    }
+    return RESULT_OK;
+}
+
 HTTPTCPConnSock::~HTTPTCPConnSock()
 {
-
+    if (conn_socket_ != NULL)
+        st_netfd_close(conn_socket_);
 }
 
 int HTTPTCPConnSock::initialize(std::string ip, long port)
@@ -131,17 +150,17 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
     bool isEnd = false;
     char c = '\0';
     while(!isEnd) {
-        if(st_read(conn_socket_,&c,1,1000) == 0) break;
+        if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
         buffer_ += c;
         // if got \n
         if(c == '\r') {
-            if(st_read(conn_socket_,&c,1,1000) == 0) break;
+            if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
             buffer_ += c;
             if(c == '\n') {
-                if(st_read(conn_socket_,&c,1,1000) == 0) break;
+                if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
                 buffer_ += c;
                 if(c == '\r') {
-                    if(st_read(conn_socket_,&c,1,1000) == 0) break;
+                    if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
                     buffer_ += c;
                     if(c == '\n') {
                         buffer_ += c;

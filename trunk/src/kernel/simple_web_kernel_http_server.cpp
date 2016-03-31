@@ -45,20 +45,28 @@ int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 
 long SimpleWebKernelHttpServer::thread_func()
 {
-    std::string request;
+    const char request[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\nConnection: close\r\n\r\n<h1>success</h1>";
+    std::string request_str;
+    int size = sizeof(request) - 1;
+    SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock();
     SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
+    char buff[1024];
     for (;;) {
         st_netfd_t sock_client = srv_sock_.accept_socket();
         if (sock_client == NULL) {
             simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "accept socket failed");
             break;
         }
-        SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
-        while (conn_sock->get_http_header_message(request)) {
-            http_decoder.deal_with_request(request, conn_sock);
+        conn_sock->set_sock(sock_client);
+        if (conn_sock->get_http_header_message(request_str)) {
+            http_decoder.deal_with_request(request_str, conn_sock);
         }
-        delete conn_sock;
-        simple_web_app_log::log("trace", "simple_web_kernel_http_server.cpp", "close one connection");
+        conn_sock->close_sock();
+        /*
+        st_read(sock_client, buff, 1024, 1000000LL*30);
+        st_write(sock_client, request, size, ST_UTIME_NO_TIMEOUT);
+        st_netfd_close(sock_client);
+         */
     }
 
     return RESULT_OK;
