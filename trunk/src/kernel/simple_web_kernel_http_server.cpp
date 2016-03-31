@@ -25,15 +25,46 @@ SOFTWARE.
 #include "../protocol/simple_web_protocol_http.h"
 #include <fstream>
 
-SimpleWebKernelHttpServer::SimpleWebKernelHttpServer() {
-    srv_socket.sock = new SimpleWebSocket::TCPServerSock();
+SimpleWebKernelHttpServer::SimpleWebKernelHttpServer()
+{
 }
 
 SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 {
-    if(srv_socket.sock != NULL) delete srv_socket.sock;
 }
 
+int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
+{
+    // initialize the socket
+    if(srv_sock_.initialize("",port) == RESULT_ERROR) {
+        simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
+        return RESULT_ERROR;
+    }
+    return RESULT_OK;
+}
+
+long SimpleWebKernelHttpServer::thread_func()
+{
+    std::string request;
+    SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
+    for (;;) {
+        st_netfd_t sock_client = srv_sock_.accept_socket();
+        if (sock_client == NULL) {
+            simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "accept socket failed");
+            break;
+        }
+        SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
+        while (conn_sock->get_http_header_message(request)) {
+            http_decoder.deal_with_request(request, conn_sock);
+        }
+        delete conn_sock;
+        simple_web_app_log::log("trace", "simple_web_kernel_http_server.cpp", "close one connection");
+    }
+
+    return RESULT_OK;
+}
+
+/*
 void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 {
 #ifdef USING_ST
@@ -56,13 +87,15 @@ void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
         SimpleWebSocket::HTTPTCPConnSock *conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
         std::string request_header;
         SimpleWebHttp::SimpleWebProtocolHttp http;
+*/
         /*
        while (conn_sock->get_http_header_message(request_header)) {
            if(!http.deal_with_request(request_header, conn_sock)) {
                break;
            }
        }
-        */
+       */
+/*
         if (conn_sock->get_http_header_message(request_header)) {
             http.deal_with_request(request_header,conn_sock);
         }
@@ -84,16 +117,9 @@ void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 #endif
     return 0;
 }
+*/
+/*
 
-int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
-{
-    // initialize the socket
-    if(srv_socket.sock->initialize("",port) == RESULT_ERROR) {
-        simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
-        return RESULT_ERROR;
-    }
-    return RESULT_OK;
-}
 
 int SimpleWebKernelHttpServer::loop()
 {
@@ -122,3 +148,4 @@ int SimpleWebKernelHttpServer::loop()
 #endif
     return RESULT_OK;
 }
+ */

@@ -35,27 +35,18 @@ SOFTWARE.
 #include <pthread.h>
 #endif
 
-
-class SimpleWebKernelHttpServer
+static const long DEFAULT_HTTP_SERVER_PORT = 8080;
+class SimpleWebKernelHttpServer : public SimpleWebAppThread
 {
 #ifdef USING_ST
-    struct socket_info{
-        //st_netfd_t nfd;
-        SimpleWebSocket::TCPServerSock* sock;
-        char *addr;
-        unsigned int port;
-        int wait_threads;
-        int busy_threads;
-        int rqst;
-    }srv_socket;
+    SimpleWebSocket::TCPServerSock srv_sock_;
 #endif
 public:
     SimpleWebKernelHttpServer();
     virtual ~SimpleWebKernelHttpServer();
 public:
     int initialize(long port);
-    int loop();
-    static void* recv_thread(void* pParam);
+    long thread_func();
 };
 
 #endif //SIMPLE_WEB_SERVER_SIMPLE_WEB_KERNEL_HTTP_SERVER_H

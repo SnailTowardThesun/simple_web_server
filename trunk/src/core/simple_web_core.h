@@ -37,6 +37,7 @@ static const long RESULT_OK = 0;
 static const long RESULT_ERROR = 1;
 // common function
 extern long simple_web_initialize();
+extern void *process_signals(void *arg);
 
 //compile switch
 #define USING_ST

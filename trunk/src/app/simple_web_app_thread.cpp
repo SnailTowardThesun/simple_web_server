@@ -23,37 +23,40 @@ SOFTWARE.
 */
 
 #include "simple_web_app_thread.h"
+#include <string.h>
 static const long DEFAULT_MAX_THREADS = 4;
 
-SimpleWebAppThread::SimpleWebAppThread():tid(NULL)
+SimpleWebAppThread::SimpleWebAppThread()
 {
-
 }
 
 SimpleWebAppThread::~SimpleWebAppThread()
 {
-
+    stop();
+    tid_list_.clear();
 }
 
-long SimpleWebAppThread::loop()
+long SimpleWebAppThread::start()
 {
     // start
-    if (tid != NULL) {
-        simple_web_app_log::log("warning", "simpe_web_app_thread.cpp", "the thread is running");
-        return RESULT_ERROR;
-    }
-    if ((tid = st_thread_create(thread_cycle, this, 0, 0)) == NULL) {
-        simple_web_app_log::log("error", "simpe_web_app_thread.cpp", "st create thread failed");
-        return RESULT_ERROR;
+    for (int i = 0; i < MAX_THREAD; ++i) {
+        st_thread_t tid;
+        if ((tid = st_thread_create(thread_cycle, this, 0, 0)) == NULL) {
+            simple_web_app_log::log("error", "simpe_web_app_thread.cpp", "st create thread failed");
+            continue;
+        }
+        tid_list_.push_back(tid);
+        st_usleep(0);
     }
     return RESULT_OK;
 }
 
 long SimpleWebAppThread::stop()
 {
-    if (tid != NULL) {
+    for (std::vector<st_thread_t>::iterator it = tid_list_.begin(); it != tid_list_.end(); ++it) {
+        st_thread_interrupt(*it);
     }
-    tid = NULL;
+    tid_list_.clear();
     return RESULT_OK;
 }
 
