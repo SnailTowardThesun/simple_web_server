@@ -197,7 +197,7 @@ bool  SimpleWebProtocolHttp::deal_with_request(std::string request, SimpleWebSoc
     response_.set_info(HTTP_VERSION,HTTP_VERSION_1);
     response_.set_info("Server: ","Simple_Web_Server_1.0");
     response_.set_info("Content-Type: ","text/html");
-
+    response_.set_info("Connection: ", "closed");
     std::string str_file;
     long str_file_size = 0;
     char size[10] = {0};

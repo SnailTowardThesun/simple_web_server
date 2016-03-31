@@ -152,6 +152,8 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
         }
     }
     message = buffer_;
+    message.erase(0,message.find_first_not_of('\0'));
+    message.erase(message.find_last_not_of('\0')+1);
     return (!message.empty());
 }
 /*

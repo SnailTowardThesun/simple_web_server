@@ -26,6 +26,10 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include <st.h>
+
+static const long DEFAULT_HTTP_SERVER_PORT = 8080;
+static const long MAX_BIND_ADDR = 16;
+static const long MAX_THREAD = 8;
 class SimpleWebAppThread
 {
 public:
@@ -34,11 +38,11 @@ public:
 private:
     st_thread_t tid;
 public:
-    virtual long start();
+    virtual long loop();
     virtual long stop();
+    virtual long thread_func();
 protected:
-    virtual void thread_cycle();
-    static void* thread_func(void* param);
+    static void* thread_cycle(void* arg);
 };
 
 #endif
