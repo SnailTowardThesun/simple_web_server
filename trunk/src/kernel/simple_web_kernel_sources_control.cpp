@@ -25,6 +25,10 @@ SOFTWARE.
 #include "simple_web_kernel_sources_control.h"
 #include "../app/simple_web_app_source_file.h"
 #include "../core/simple_web_core_source.h"
+#include <unistd.h>
+#include <limits.h>
+#include <string.h>
+
 SimpleWebKernelSourcesCtl::SimpleWebKernelSourcesCtl()
 {
 
@@ -36,7 +40,7 @@ SimpleWebKernelSourcesCtl::~SimpleWebKernelSourcesCtl()
 }
 
 SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::pInstance_ = NULL;
-
+std::string SimpleWebKernelSourcesCtl::current_path_ = "";
 SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::getInstance()
 {
     if(pInstance_ == NULL) {
@@ -56,6 +60,12 @@ SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
 
 long SimpleWebKernelSourcesCtl::initialize()
 {
+    // get the www folder path
+    char path[PATH_MAX] = {0};
+    char *pPath;
+    pPath = getcwd(path, PATH_MAX);
+    current_path_ = pPath;
+
     // make a static source as test case
     SimpleWebCoreSource* pIndex = new SimpleWebAppSourceFile();
     pIndex->initialize("/index.html", "");

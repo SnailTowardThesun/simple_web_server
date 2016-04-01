@@ -45,7 +45,7 @@ public:
     SimpleWebKernelHttpServer();
     virtual ~SimpleWebKernelHttpServer();
 public:
-    int initialize(long port);
+    int initialize(std::string ip, long port);
     long thread_func();
 };
 

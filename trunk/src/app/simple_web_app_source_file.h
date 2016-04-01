@@ -26,7 +26,7 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include "../core/simple_web_core_source.h"
-
+#include <st.h>
 class SimpleWebAppSourceFile:public SimpleWebCoreSource
 {
 public:

@@ -33,10 +33,10 @@ SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 {
 }
 
-int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
+int SimpleWebKernelHttpServer::initialize(std::string ip, long port = DEFAULT_HTTP_SERVER_PORT)
 {
     // initialize the socket
-    if(srv_sock_.initialize("",port) == RESULT_ERROR) {
+    if (srv_sock_.initialize(ip,port) == RESULT_ERROR) {
         simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
         return RESULT_ERROR;
     }
@@ -45,12 +45,9 @@ int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 
 long SimpleWebKernelHttpServer::thread_func()
 {
-    const char request[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\nConnection: close\r\n\r\n<h1>success</h1>";
     std::string request_str;
-    int size = sizeof(request) - 1;
     SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock();
     SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
-    char buff[1024];
     for (;;) {
         st_netfd_t sock_client = srv_sock_.accept_socket();
         if (sock_client == NULL) {
@@ -62,98 +59,7 @@ long SimpleWebKernelHttpServer::thread_func()
             http_decoder.deal_with_request(request_str, conn_sock);
         }
         conn_sock->close_sock();
-        /*
-        st_read(sock_client, buff, 1024, 1000000LL*30);
-        st_write(sock_client, request, size, ST_UTIME_NO_TIMEOUT);
-        st_netfd_close(sock_client);
-         */
     }
-
+    delete conn_sock;
     return RESULT_OK;
 }
-
-/*
-void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
-{
-#ifdef USING_ST
-    socket_info* socket = (socket_info*)pParam;
-//    while (socket->wait_threads < MAX_THREAD) {
-    while (socket->wait_threads <= MAX_THREAD) {
-        st_netfd_t sock_client = socket->sock->accept_socket();
-        if (sock_client == NULL) {
-            simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "fail to accept socket");
-            continue;
-        }
-        socket->wait_threads--;
-        socket->busy_threads++;
-        if (socket->wait_threads < 0 && socket->wait_threads + socket->busy_threads < MAX_THREAD) {
-            if (st_thread_create(recv_thread, socket, 0, 0) != NULL) {
-                socket->wait_threads++;
-            }
-        }
-        // handle the socket
-        SimpleWebSocket::HTTPTCPConnSock *conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
-        std::string request_header;
-        SimpleWebHttp::SimpleWebProtocolHttp http;
-*/
-        /*
-       while (conn_sock->get_http_header_message(request_header)) {
-           if(!http.deal_with_request(request_header, conn_sock)) {
-               break;
-           }
-       }
-       */
-/*
-        if (conn_sock->get_http_header_message(request_header)) {
-            http.deal_with_request(request_header,conn_sock);
-        }
-        delete conn_sock;
-       socket->wait_threads++;
-       socket->busy_threads--;
-    }
-#else
-    simple_web_app_log::log("trace", "simple_web_kernel_http_server.cpp", "get one connection");
-    SimpleWebSocket::HTTPTCPConnSock* sock = (SimpleWebSocket::HTTPTCPConnSock*)pParam;
-    SimpleWebHttp::SimpleWebProtocolHttp http;
-    // recv the client's request
-    std::string http_request;
-    while(sock->get_http_header_message(http_request)) {
-        if(!http.deal_with_request(http_request,sock)) {
-            break;
-        }
-    }
-#endif
-    return 0;
-}
-*/
-/*
-
-
-int SimpleWebKernelHttpServer::loop()
-{
-#ifdef USING_ST
-    for (int i =0; i < MAX_THREAD; i++) {
-        st_thread_t tid;
-        if ((tid = st_thread_create(recv_thread, (void*)&srv_socket, 0, 0)) == NULL) {
-            simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to create recv thread");
-        }
-  //      srv_socket.wait_threads++;
-    }
-    while(1) {
-        st_usleep(100);
-    }
-#else
-    int sock_client = 0;
-    while(1) {
-        if((sock_client = p_socket_->accept_socket()) == -1) {
-            sleep(1);
-            continue;
-        }
-        SimpleWebSocket::HTTPTCPConnSock* conn_socket = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
-        pthread_t thread;
-        pthread_create(&thread,NULL,recv_thread,(void*)conn_socket);
-    }
-#endif
-    return RESULT_OK;
-}
- */

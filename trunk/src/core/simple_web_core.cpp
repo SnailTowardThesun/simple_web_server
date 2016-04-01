@@ -69,7 +69,6 @@ static void install_sighandlers(void)
         exit(0);
     }
 
-
     /* Install signal handlers */
     Signal(SIGTERM, child_sighandler);  /* terminate */
     Signal(SIGHUP,  child_sighandler);  /* restart   */
