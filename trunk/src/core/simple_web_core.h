@@ -36,7 +36,7 @@ static const std::string  SIMPLE_WEB_SERVER_NAME = "Simple_Web_Server_1,0";
 static const long RESULT_OK = 0;
 static const long RESULT_ERROR = 1;
 // common function
-extern long simple_web_initialize();
+extern long simple_web_initialize(std::string base_folder_path);
 extern void *process_signals(void *arg);
 
 //compile switch

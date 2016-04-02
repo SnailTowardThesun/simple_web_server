@@ -85,6 +85,9 @@ namespace SimpleWebHttp
     static const std::string HTTP_RESPONSE_504 = "504 Gateway Time-out";
     static const std::string HTTP_RESPONSE_505 = "505 HTTP Version not supported";
 
+    // the default string for response
+    static const std::string HTTP_404_RESPONSE_HTML = "<h1>404 Not Found</h1>";
+
     static bool is_http_method(std::string str)
     {
                 return (str == "GET" ||
@@ -97,6 +100,7 @@ namespace SimpleWebHttp
                 str == "CONNECT"    ||
                 str == "PATCH");
     }
+
 }
 
 #endif

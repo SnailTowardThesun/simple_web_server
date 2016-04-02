@@ -40,7 +40,7 @@ SimpleWebKernelSourcesCtl::~SimpleWebKernelSourcesCtl()
 }
 
 SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::pInstance_ = NULL;
-std::string SimpleWebKernelSourcesCtl::current_path_ = "";
+
 SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::getInstance()
 {
     if(pInstance_ == NULL) {
@@ -58,21 +58,22 @@ SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
     return source_list_[file_url];
 }
 
-long SimpleWebKernelSourcesCtl::initialize()
+long SimpleWebKernelSourcesCtl::initialize(std::string base_folder_path)
 {
     // get the www folder path
-    char path[PATH_MAX] = {0};
-    char *pPath;
-    pPath = getcwd(path, PATH_MAX);
-    current_path_ = pPath;
+    if (base_folder_path.empty()) {
+        simple_web_app_log::log("error", "simple_web_core.cpp", "the base folder's path is empty");
+        return RESULT_ERROR;
+    }
+    current_path_ = base_folder_path;
 
     // make a static source as test case
     SimpleWebCoreSource* pIndex = new SimpleWebAppSourceFile();
-    pIndex->initialize("/index.html", "");
+    pIndex->initialize("/index.html", current_path_ + "/index.html");
     source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/index.html",pIndex));
     // add the http protocol source like 404,500 etc.
     SimpleWebCoreSource* p404Index = new SimpleWebAppSourceFile();
-    p404Index->initialize("/404.html", "");
+    p404Index->initialize("/404.html", current_path_ + "/404.html");
     source_list_.insert(std::pair<std::string,SimpleWebCoreSource*>("/404.html",p404Index));
 
     return RESULT_OK;

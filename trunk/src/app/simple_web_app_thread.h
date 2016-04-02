@@ -27,7 +27,7 @@ SOFTWARE.
 #include "../core/simple_web_core.h"
 #include <st.h>
 
-static const long MAX_THREAD = 800;
+static const long MAX_THREAD = 8;
 class SimpleWebAppThread
 {
 public:

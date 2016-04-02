@@ -32,6 +32,16 @@ class SimpleWebAppSourceFile:public SimpleWebCoreSource
 public:
     SimpleWebAppSourceFile();
     virtual ~SimpleWebAppSourceFile();
+private:
+    std::string file_path_;
+    st_netfd_t file_netfd_;
+    int file_pointer_;
+    char buffer[1024];
+    std::string file_content_;
+protected:
+    int read_file();
+    long open_file();
+    long close_file();
 public:
     virtual int initialize(std::string source_name, std::string url);
     virtual int get_file_content(std::string& str, long& size);

@@ -37,14 +37,13 @@ public:
     virtual ~SimpleWebKernelSourcesCtl();
 private:
     static SimpleWebKernelSourcesCtl*  pInstance_;
-    // get the www folder
-    static std::string current_path_;
 public:
     static SimpleWebKernelSourcesCtl* getInstance();
 private:
     std::map<std::string,SimpleWebCoreSource*> source_list_;
+    std::string current_path_;
 public:
-    long initialize();
+    long initialize(std::string base_folder_path);
     SimpleWebCoreSource* get_source(std::string file_url);
 };
 

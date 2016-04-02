@@ -82,10 +82,10 @@ static void install_sighandlers(void)
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 }
 
-long simple_web_initialize()
+long simple_web_initialize(std::string base_folder_path)
 {
     // initialize the source control
-    if (SimpleWebKernelSourcesCtl::getInstance()->initialize() != RESULT_OK) {
+    if (SimpleWebKernelSourcesCtl::getInstance()->initialize(base_folder_path) != RESULT_OK) {
         simple_web_app_log::log("help", "simple_web_core.cpp", "SimpleWebKernelSourcesCtl initialize failed");
         return RESULT_ERROR;
     }

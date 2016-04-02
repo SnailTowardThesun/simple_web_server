@@ -145,6 +145,7 @@ int HTTPTCPConnSock::initialize(std::string ip, long port)
 bool HTTPTCPConnSock::get_http_header_message(std::string& message)
 {
     message.clear();
+    /*
     buffer_.clear();
     // end with \r\n\r\n
     bool isEnd = false;
@@ -170,7 +171,14 @@ bool HTTPTCPConnSock::get_http_header_message(std::string& message)
             }
         }
     }
-    message = buffer_;
+     */
+    char buffer[1024];
+    if (st_read_fully(conn_socket_, buffer, 1024, TIME_OUT_LIMIT) > 0) {
+        simple_web_app_log::log("error", "simple_web_app_socket.cpp", "recv the tcp message failed");
+        return false;
+    }
+    message = buffer;
+    // delete the '\0'
     message.erase(0,message.find_first_not_of('\0'));
     message.erase(message.find_last_not_of('\0')+1);
     return (!message.empty());

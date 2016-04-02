@@ -27,7 +27,7 @@ SOFTWARE.
 int main(int argc,char** argv)
 {
     // initialize the global varibales
-    if (simple_web_initialize() != RESULT_OK) {
+    if (simple_web_initialize("/home/hankun/github/simple_web_server/trunk/objs/www") != RESULT_OK) {
         simple_web_app_log::log("error","simple_web_server.cpp","fail to initialize the SourceCtl part");
         return -1;
     }
