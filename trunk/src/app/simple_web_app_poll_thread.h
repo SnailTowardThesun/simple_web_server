@@ -25,12 +25,39 @@ SOFTWARE.
 #define SIMPLE_WEB_APP_POLL_THREAD_H
 
 #include "../core/simple_web_core.h"
+#include <sys/epoll.h>
 
+#define FOR_DEBUG
+#ifdef FOR_DEBUG
+static const long default_port = 8080;
+static const long max_event_num = 8;
+#endif
 class SimpleWebAppPollThread
 {
 public:
     SimpleWebAppPollThread();
     virtual ~SimpleWebAppPollThread();
+private:
+    std::vector<epoll_event*> poll_event_list;
+public:
+    virtual long initialize();
+    virtual long loop();
+    virtual long stop();
+    virtual long thread_func();
+protected:
+    static void* thread_cycle(void* arg);
+
+#ifdef FOR_DEBUG
+public:
+    long signal_in_class;
+    int epoll_fd;
+    int listen_socket_fd;
+    struct epoll_event event;
+    struct epoll_event* events;
+
+    long create_socket_bind();
+    long make_socket_no_blocking();
+#endif
 };
 
 #endif
