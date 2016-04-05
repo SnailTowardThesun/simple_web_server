@@ -36,17 +36,16 @@ SimpleWebAppThread::~SimpleWebAppThread()
     tid_list_.clear();
 }
 
-long SimpleWebAppThread::start()
+long SimpleWebAppThread::start(void* param)
 {
+    arg* pass_param = new arg();
+    pass_param->pThis = this;
+    pass_param->pParam = param;
     // start
-    for (int i = 0; i < MAX_THREAD; ++i) {
-        st_thread_t tid;
-        if ((tid = st_thread_create(thread_cycle, this, 0, 0)) == NULL) {
-            simple_web_app_log::log("error", "simpe_web_app_thread.cpp", "st create thread failed");
-            continue;
-        }
-        tid_list_.push_back(tid);
-        st_usleep(0);
+    st_thread_t tid;
+    if ((tid = st_thread_create(thread_cycle, (void*)pass_param, 0, 0)) == NULL) {
+        simple_web_app_log::log("error", "simpe_web_app_thread.cpp", "st create thread failed");
+        return RESULT_ERROR;
     }
     return RESULT_OK;
 }
@@ -60,7 +59,7 @@ long SimpleWebAppThread::stop()
     return RESULT_OK;
 }
 
-long SimpleWebAppThread::thread_func()
+long SimpleWebAppThread::thread_func(void* arg)
 {
     simple_web_app_log::log("trace", "simple_web_app_thread.cpp", "step into base thread");
     return RESULT_OK;
@@ -68,9 +67,11 @@ long SimpleWebAppThread::thread_func()
 
 void* SimpleWebAppThread::thread_cycle(void* param) {
     // base class just show a log
-    SimpleWebAppThread *pC = (SimpleWebAppThread *) param;
-    pC->thread_func();
+    arg* pArg = (arg*)param;
+    SimpleWebAppThread *pC = (SimpleWebAppThread *) pArg->pThis;
+    pC->thread_func(pArg->pParam);
     simple_web_app_log::log("trace", "simple_web_app_thread.cpp", "ready to exit trehad");
+    delete param;
     return NULL;
 }
 

@@ -33,8 +33,6 @@ int main(int argc,char** argv)
     }
     // start a http server
     SimpleWebKernelHttpServer http_server;
-    if(http_server.initialize("",9090) == RESULT_ERROR) return 0;
-    http_server.start();
-    process_signals(NULL);
-    return 0;
+    if(http_server.initialize("",9090) == RESULT_ERROR) return -1;
+    return http_server.loop();
 }

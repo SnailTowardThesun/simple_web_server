@@ -26,19 +26,22 @@ SOFTWARE.
 
 #include "../core/simple_web_core.h"
 #include <st.h>
-
 static const long MAX_THREAD = 8;
 class SimpleWebAppThread
 {
+    typedef struct {
+        void* pThis;
+        void* pParam;
+    }arg;
 public:
     SimpleWebAppThread();
     virtual ~SimpleWebAppThread();
 private:
     std::vector<st_thread_t> tid_list_;
 public:
-    virtual long start();
+    virtual long start(void* pParam);
     virtual long stop();
-    virtual long thread_func();
+    virtual long thread_func(void* arg);
 protected:
     static void* thread_cycle(void* arg);
 };

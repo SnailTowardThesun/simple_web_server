@@ -45,7 +45,7 @@ int SimpleWebAppSourceFile::read_file()
         file_content_ += buffer;
         memset(buffer, 0, 1024);
     }
-    file_content_ += buffer;
+    file_content_ += "this is html file";
     return RESULT_OK;
 }
 

@@ -43,23 +43,32 @@ int SimpleWebKernelHttpServer::initialize(std::string ip, long port = DEFAULT_HT
     return RESULT_OK;
 }
 
-long SimpleWebKernelHttpServer::thread_func()
+int SimpleWebKernelHttpServer::loop()
 {
-    std::string request_str;
-    SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock();
-    SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
-    for (;;) {
+    int ret = RESULT_OK;
+    while (1) {
         st_netfd_t sock_client = srv_sock_.accept_socket();
         if (sock_client == NULL) {
             simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "accept socket failed");
+            ret = RESULT_ERROR;
             break;
         }
+        SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock();
         conn_sock->set_sock(sock_client);
-        if (conn_sock->get_http_header_message(request_str)) {
-            http_decoder.deal_with_request(request_str, conn_sock);
-        }
-        conn_sock->close_sock();
+        start((void*)conn_sock);
     }
+    return ret;
+}
+
+long SimpleWebKernelHttpServer::thread_func(void* arg)
+{
+    std::string request_str;
+    SimpleWebSocket::HTTPTCPConnSock* conn_sock = (SimpleWebSocket::HTTPTCPConnSock*)arg;
+    SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
+    if (conn_sock->get_http_header_message(request_str)) {
+        http_decoder.deal_with_request(request_str, conn_sock);
+    }
+    conn_sock->close_sock();
     delete conn_sock;
     return RESULT_OK;
 }
