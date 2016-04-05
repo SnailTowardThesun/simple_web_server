@@ -37,39 +37,16 @@ SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 void* SimpleWebKernelHttpServer::recv_thread(void* pParam)
 {
 #ifdef USING_ST
-    socket_info* socket = (socket_info*)pParam;
-//    while (socket->wait_threads < MAX_THREAD) {
-    while (socket->wait_threads <= MAX_THREAD) {
-        st_netfd_t sock_client = socket->sock->accept_socket();
-        if (sock_client == NULL) {
-            simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "fail to accept socket");
-            continue;
-        }
-        socket->wait_threads--;
-        socket->busy_threads++;
-        if (socket->wait_threads < 0 && socket->wait_threads + socket->busy_threads < MAX_THREAD) {
-            if (st_thread_create(recv_thread, socket, 0, 0) != NULL) {
-                socket->wait_threads++;
-            }
-        }
-        // handle the socket
-        SimpleWebSocket::HTTPTCPConnSock *conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
-        std::string request_header;
-        SimpleWebHttp::SimpleWebProtocolHttp http;
-        /*
-       while (conn_sock->get_http_header_message(request_header)) {
-           if(!http.deal_with_request(request_header, conn_sock)) {
-               break;
-           }
-       }
-        */
-        if (conn_sock->get_http_header_message(request_header)) {
-            http.deal_with_request(request_header,conn_sock);
-        }
-        delete conn_sock;
-       socket->wait_threads++;
-       socket->busy_threads--;
+    simple_web_app_log::log("trace", "simpel_web_kernel_http_server.cpp", "step into thread");
+    // handle the socket
+    SimpleWebSocket::HTTPTCPConnSock *conn_sock = (SimpleWebSocket::HTTPTCPConnSock*)pParam;
+    std::string request_header;
+    SimpleWebHttp::SimpleWebProtocolHttp http;
+    if (conn_sock->get_http_header_message(request_header)) {
+        http.deal_with_request(request_header,conn_sock);
     }
+    delete conn_sock;
+    simple_web_app_log::log("trace", "simpel_web_kernel_http_server.cpp", "step out of thread");
 #else
     simple_web_app_log::log("trace", "simple_web_kernel_http_server.cpp", "get one connection");
     SimpleWebSocket::HTTPTCPConnSock* sock = (SimpleWebSocket::HTTPTCPConnSock*)pParam;
@@ -98,15 +75,18 @@ int SimpleWebKernelHttpServer::initialize(long port = DEFAULT_HTTP_SERVER_PORT)
 int SimpleWebKernelHttpServer::loop()
 {
 #ifdef USING_ST
-    for (int i =0; i < MAX_THREAD; i++) {
-        st_thread_t tid;
-        if ((tid = st_thread_create(recv_thread, (void*)&srv_socket, 0, 0)) == NULL) {
-            simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to create recv thread");
+    st_thread_t tid;
+    while (1) {
+        st_netfd_t sock_client = srv_socket.sock->accept_socket();
+        if (sock_client == NULL) {
+            simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "fail to accept socket");
+            return RESULT_ERROR;
         }
-  //      srv_socket.wait_threads++;
-    }
-    while(1) {
-        st_usleep(100);
+        SimpleWebSocket::HTTPTCPConnSock* conn_sock = new SimpleWebSocket::HTTPTCPConnSock(sock_client);
+        if ((tid = st_thread_create(recv_thread, (void *) conn_sock, 0, 0)) == NULL) {
+            simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "fail to create recv thread");
+        }
+        st_sleep(0);
     }
 #else
     int sock_client = 0;

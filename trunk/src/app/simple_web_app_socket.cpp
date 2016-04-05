@@ -108,7 +108,9 @@ HTTPTCPConnSock::HTTPTCPConnSock(st_netfd_t sock):conn_socket_(sock)
 
 HTTPTCPConnSock::~HTTPTCPConnSock()
 {
-
+    if(conn_socket_ != NULL) {
+        st_netfd_close(conn_socket_);
+    }
 }
 
 int HTTPTCPConnSock::initialize(std::string ip, long port)
