@@ -1,0 +1,161 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2016 ME_Kun_Han
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include "simple_web_app_poll_thread.h"
+#ifdef FOR_DEBUG
+SimpleWebAppPollThread::SimpleWebAppPollThread() : signal_in_class(true),
+                                                   epoll_fd(NULL),
+                                                   listen_socket_fd(NULL),
+                                                   events(NULL)
+#else
+SimpleWebAppPollThread::SimpleWebAppPollThread()
+#endif
+{
+}
+
+SimpleWebAppPollThread::~SimpleWebAppPollThread()
+{
+    if (!poll_event_list.empty()) {
+        poll_event_list.clear();
+    }
+}
+
+#ifdef FOR_DEBUG
+long SimpleWebAppPollThread::create_socket_bind()
+{
+    if (listen_socket_fd != NULL) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp"
+                , "the thread is running");
+        return RESULT_ERROR;
+    }
+    listen_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (listen_socket_fd == -1) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "create socket failed");
+        return RESULT_ERROR;
+    }
+    struct sockaddr_in name;
+    long host_port_ = default_port;
+    name.sin_family = AF_INET;
+    name.sin_port = htons(host_port_);
+    name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
+    // bind the socket
+    if(bind(listen_socket_fd,(const sockaddr*)&name,sizeof(name)) < 0) {
+        simple_web_app_log::log("error","simple_web_app_poll_thread.cpp","fail to bind the socket");
+        return RESULT_ERROR;
+    }
+    // make socket no block
+    if (make_socket_no_blocking() == RESULT_ERROR) {
+        simple_web_app_log::log("error", "simpel_web_app_poll_thread.cpp"
+                , "make socket no block failed");
+        return RESULT_ERROR;
+    }
+    // begin to listen and set the default queue at 100;
+    if(listen(listen_socket_fd, 100) < 0) {
+        simple_web_app_log::log("error", "simple_web_app_socket.cpp", "fail to listen");
+        close(listen_socket_fd);
+        return RESULT_ERROR;
+    }
+    return RESULT_OK;
+}
+
+long SimpleWebAppPollThread::make_socket_no_blocking()
+{
+    return RESULT_OK;
+}
+#endif
+
+long SimpleWebAppPollThread::initialize()
+{
+    // create the listen socket
+    if (create_socket_bind() == RESULT_ERROR) {
+        simple_web_app_log::log("error", "simpel_web_app_epoll_thread.cpp"
+                , "create socket, bind it and listen failed");
+        return RESULT_ERROR;
+    }
+    epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "create the epoll failed");
+        return RESULT_ERROR;
+    }
+    event.data.fd = listen_socket_fd;
+    event.events = EPOLLIN | EPOLLET;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_socket_fd, &event) == -1) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll control failed");
+        return RESULT_ERROR;
+    }
+    if (events != NULL) {
+        delete events;
+        events = NULL;
+    }
+    events = (epoll_event*)malloc(sizeof(epoll_event) * max_event_num);
+
+    return RESULT_OK;
+}
+
+long SimpleWebAppPollThread::loop()
+{
+    long ret = RESULT_OK;
+    while(signal_in_class) {
+        // loop to get the epoll singnal
+        int i = 0;
+        int n = epoll_wait(epoll_fd, events, max_event_num, -1);
+        for (i = 0; i < n; i++) {
+            if(events[i].events & EPOLLERR
+               || events[i].events & EPOLLHUP
+               || events[i].events & EPOLLIN) {
+                simple_web_app_log::log("error", "smple_web_app_poll_thread.cpp"
+                        , "epoll failed");
+                close(events[i].data.fd);
+                continue;
+            }
+            else if (listen_socket_fd == events[i].data.fd) {
+
+            } else {
+
+            }
+        }
+    }
+    return ret;
+}
+
+long SimpleWebAppPollThread::thread_func()
+{
+    long ret = RESULT_OK;
+    return ret;
+}
+
+long SimpleWebAppPollThread::stop()
+{
+    long ret = RESULT_OK;
+    return ret;
+}
+
+void* SimpleWebAppPollThread::thread_cycle(void *arg)
+{
+    return NULL;
+}
