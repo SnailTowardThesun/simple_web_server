@@ -43,7 +43,7 @@ public:
     virtual long initialize();
     virtual long loop();
     virtual long stop();
-    virtual long thread_func();
+    virtual long thread_func(void* arg);
 protected:
     static void* thread_cycle(void* arg);
 
@@ -56,7 +56,7 @@ public:
     struct epoll_event* events;
 
     long create_socket_bind();
-    long make_socket_no_blocking();
+    long make_socket_non_blocking(int infd);
 #endif
 };
 

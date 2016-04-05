@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #include "core/simple_web_core.h"
 #include "kernel/simple_web_kernel_http_server.h"
-#include "kernel/simple_web_kernel_sources_control.h"
+#include "app/simple_web_app_poll_thread.h"
 int main(int argc,char** argv)
 {
     // initialize the global varibales
@@ -31,8 +31,13 @@ int main(int argc,char** argv)
         simple_web_app_log::log("error","simple_web_server.cpp","fail to initialize the SourceCtl part");
         return -1;
     }
+    SimpleWebAppPollThread th;
+    th.initialize();
+    return th.loop();
+    /*
     // start a http server
     SimpleWebKernelHttpServer http_server;
     if(http_server.initialize("",9090) == RESULT_ERROR) return -1;
     return http_server.loop();
+     */
 }
