@@ -35,7 +35,7 @@ SimpleWebAppThread::~SimpleWebAppThread()
 
 }
 
-long SimpleWebAppThread::loop()
+long SimpleWebAppThread::start()
 {
     // start
     if (tid != NULL) {

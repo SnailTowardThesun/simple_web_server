@@ -38,7 +38,7 @@ public:
 private:
     st_thread_t tid;
 public:
-    virtual long loop();
+    virtual long start();
     virtual long stop();
     virtual long thread_func();
 protected:
