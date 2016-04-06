@@ -42,19 +42,16 @@ private:
 public:
     virtual long initialize();
     virtual long loop();
-    virtual long stop();
-    virtual long thread_func(void* arg);
-protected:
-    static void* thread_cycle(void* arg);
+    virtual long do_with_fd(int fd);
 
 #ifdef FOR_DEBUG
-public:
+private:
     long signal_in_class;
     int epoll_fd;
     int listen_socket_fd;
     struct epoll_event event;
     struct epoll_event* events;
-
+protected:
     long create_socket_bind();
     long make_socket_non_blocking(int infd);
 #endif

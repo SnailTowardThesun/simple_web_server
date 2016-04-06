@@ -29,6 +29,7 @@ SOFTWARE.
 #include <netdb.h>
 #include <cerrno>
 #include <fcntl.h>
+#include <cstring>
 #include "simple_web_app_poll_thread.h"
 #ifdef FOR_DEBUG
 SimpleWebAppPollThread::SimpleWebAppPollThread() : signal_in_class(true),
@@ -92,17 +93,15 @@ long SimpleWebAppPollThread::make_socket_non_blocking(int infd)
 {    
     int flags, s;
     flags = fcntl(infd, F_GETFL, 0);
-    if (flags == -1)
-    {
-        perror("fcntl");
+    if (flags == -1) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "fcntl failed");
         return -1;
     }
 
     flags |= O_NONBLOCK;
     s = fcntl(infd, F_SETFL, flags);
-    if (s == -1)
-    {
-        perror("fcntl");
+    if (s == -1) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "fcntl failed");
         return -1;
     }
     return 0;
@@ -143,8 +142,14 @@ long SimpleWebAppPollThread::loop()
     while(signal_in_class) {
         // loop to get the epoll singnal
         int i = 0;
+        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "step into while loop");
         int n = epoll_wait(epoll_fd, events, max_event_num, -1);
+        if(n == -1) {
+            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll wait failed");
+            return RESULT_ERROR;
+        }
         for (i = 0; i < n; i++) {
+            std::cout<<"n is "<<n<<" i is "<<i<<std::endl;
             if((events[i].events & EPOLLERR)
                || (events[i].events & EPOLLHUP)
                || !(events[i].events & EPOLLIN)) {
@@ -153,108 +158,82 @@ long SimpleWebAppPollThread::loop()
                 close(events[i].data.fd);
                 break;
             }
-            else if (listen_socket_fd == events[i].data.fd) {
-                while (1) {
-                    struct sockaddr in_addr;
-                    socklen_t in_len;
-                    int infd;
-                    char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
-
-                    in_len = sizeof in_addr;
-                    infd = accept(listen_socket_fd, &in_addr, &in_len);
-                    if (infd == -1)
-                    {
-                        if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
-                        {
-                            /* We have processed all incoming
-                             connections. */
-                            break;
-                        }
-                        else
-                        {
-                            perror("accept");
-                            break;
-                        }
+            if (listen_socket_fd == events[i].data.fd) {
+                struct sockaddr in_addr;
+                socklen_t in_len;
+                int infd;
+                char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+                in_len = sizeof in_addr;
+                infd = accept(listen_socket_fd, &in_addr, &in_len);
+                if (infd == -1) {
+                    if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+                        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp"
+                                , "the errno is EAGAIN when accepting the socket");
+                        break;
                     }
-
-                    int s = getnameinfo(&in_addr, in_len, hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
-                    if (s == 0)
-                    {
-                        printf("Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
-                    }
-
-                    s = make_socket_non_blocking(infd);
-                    if (s == -1)
-                        abort();
-
-                    event.data.fd = infd;
-                    event.events = EPOLLIN | EPOLLET;
-                    s = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, infd, &event);
-                    if (s == -1)
-                    {
-                        perror("epoll_ctl");
-                        abort();
+                    else {
+                        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp"
+                                , "accept socket failed");
+                        break;
                     }
                 }
-                continue;
+
+                int s = getnameinfo(&in_addr, in_len, hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
+                if (s == 0) {
+                    printf("Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
+                }
+
+                s = (int) make_socket_non_blocking(infd);
+                if (s == -1) {
+                    abort();
+                }
+
+                event.data.fd = infd;
+                event.events = EPOLLIN | EPOLLET;
+                s = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, infd, &event);
+                if (s == -1) {
+                    simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll ctl failed");
+                    abort();
+                }
+                simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in accepting one socket");
             } else {
-                int done = 0;
-                while (1)
-                {
-                    ssize_t count;
-                    char buf[512];
-                    count = read(events[i].data.fd, buf, sizeof buf);
-                    if (count == -1)
-                    {
-                        if (errno != EAGAIN)
-                        {
-                            perror("read");
-                            done = 1;
-                        }
-                        break;
-                    }
-                    else if (count == 0)
-                    {
-                        /* End of file. The remote has closed the
-                         connection. */
-                        done = 1;
-                        break;
-                    }
-                    ssize_t s;
-                    char resp[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\nContent-Length: 18\r\n"
-                            "Connection: close\r\n\r\n<H2>It worked!</H2>\n";
-                    s = write(1, resp, sizeof(resp) - 1);
-                    s = write(events[i].data.fd, resp, sizeof(resp) - 1);
-                    if (s == -1)
-                    {
-                        perror("write");
-                        abort();
-                    }
-                }
-                if (done)
-                {
-                    printf("Closed connection on descriptor %d\n", events[i].data.fd);
-                    close(events[i].data.fd);
-                }
+                do_with_fd(events[i].data.fd);
             }
         }
     }
     return ret;
 }
 
-long SimpleWebAppPollThread::thread_func(void* arg)
+long SimpleWebAppPollThread::do_with_fd(int fd)
 {
-    long ret = RESULT_OK;
-    return ret;
-}
-
-long SimpleWebAppPollThread::stop()
-{
-    long ret = RESULT_OK;
-    return ret;
-}
-
-void* SimpleWebAppPollThread::thread_cycle(void *arg)
-{
-    return NULL;
+    int done = 0;
+    while (1) {
+        char buf[512];
+        ssize_t count = read(fd, buf, sizeof buf);
+        if (count == -1) {
+            if(errno != EAGAIN) {
+                done = 1;
+            }
+            break;
+        }
+        else if(count == 0) {
+            done = 1;
+            break;
+        }
+        // judge whether we get the the whole message
+        char resp[] = "HTTP/1.0 200 OK\r\nContent-type: text/html\r\nContent-Length: 18\r\n"
+                "Connection: close\r\n\r\n<H2>It worked!</H2>\n";
+        ssize_t s = write(fd, resp, sizeof(resp) - 1);
+        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "success in sending msg");
+        if (s == -1) {
+            perror("write");
+            abort();
+        }
+        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in dealing one connection");
+    }
+    if (done == 1) {
+        printf("Closed connection on descriptor %d\n", fd);
+        close(fd);
+    }
+    return RESULT_OK;
 }
