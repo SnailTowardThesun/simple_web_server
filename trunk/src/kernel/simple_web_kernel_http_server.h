@@ -24,18 +24,17 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_SERVER_SIMPLE_WEB_KERNEL_HTTP_SERVER_H
 #define SIMPLE_WEB_SERVER_SIMPLE_WEB_KERNEL_HTTP_SERVER_H
 
-#include "../core/simple_web_core.h"
-#include "../app/simple_web_app_socket.h"
+#include <simple_web_core.h>
+#include <simple_web_app_socket.h>
 
 
 #ifdef USING_ST
 #include <st.h>
-#include "../app/simple_web_app_thread.h"
+#include <simple_web_app_thread.h>
 #else
 #include <pthread.h>
 #endif
 
-static const long DEFAULT_HTTP_SERVER_PORT = 8080;
 class SimpleWebKernelHttpServer : public SimpleWebAppThread
 {
 #ifdef USING_ST

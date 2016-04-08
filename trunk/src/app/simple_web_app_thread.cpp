@@ -22,9 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "simple_web_app_thread.h"
-#include <string.h>
-static const long DEFAULT_MAX_THREADS = 4;
+#include <simple_web_app_thread.h>
 
 SimpleWebAppThread::SimpleWebAppThread()
 {
@@ -33,7 +31,7 @@ SimpleWebAppThread::SimpleWebAppThread()
 SimpleWebAppThread::~SimpleWebAppThread()
 {
     stop();
-    tid_list_.clear();
+    tid_list.clear();
 }
 
 long SimpleWebAppThread::start(void* param)
@@ -52,10 +50,10 @@ long SimpleWebAppThread::start(void* param)
 
 long SimpleWebAppThread::stop()
 {
-    for (std::vector<st_thread_t>::iterator it = tid_list_.begin(); it != tid_list_.end(); ++it) {
+    for (std::vector<st_thread_t>::iterator it = tid_list.begin(); it != tid_list.end(); ++it) {
         st_thread_interrupt(*it);
     }
-    tid_list_.clear();
+    tid_list.clear();
     return RESULT_OK;
 }
 
@@ -74,4 +72,3 @@ void* SimpleWebAppThread::thread_cycle(void* param) {
     delete param;
     return NULL;
 }
-

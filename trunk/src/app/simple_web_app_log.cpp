@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "simple_web_app_log.h"
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <stdarg.h>
 
+#define DEFAULT_SIMPLE_WEB_LOG_FILE "simple_web.log"
+#define LOG_MAX_SIZE 4096
 simple_web_app_log::simple_web_app_log() :
     log_file_name(DEFAULT_SIMPLE_WEB_LOG_FILE),
     log_data(NULL)

@@ -24,9 +24,8 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_APP_THREAD_H
 #define SIMPLE_WEB_APP_THREAD_H
 
-#include "../core/simple_web_core.h"
+#include <simple_web_core.h>
 #include <st.h>
-static const long MAX_THREAD = 8;
 class SimpleWebAppThread
 {
     typedef struct {
@@ -37,7 +36,7 @@ public:
     SimpleWebAppThread();
     virtual ~SimpleWebAppThread();
 private:
-    std::vector<st_thread_t> tid_list_;
+    std::vector<st_thread_t> tid_list;
 public:
     virtual long start(void* pParam);
     virtual long stop();

@@ -21,11 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_app_source_file.h"
-#include "../protocol/simple_web_protocol_http_common_variables.h"
+#include <simple_web_app_source_file.h>
+#include <simple_web_protocol_http_common_variables.h>
 #include <string.h>
 #include <fcntl.h>
-SimpleWebAppSourceFile::SimpleWebAppSourceFile() : file_pointer_(NULL)
+#include <unistd.h>
+
+SimpleWebAppSourceFile::SimpleWebAppSourceFile() : file_pointer(0)
 {
 }
 
@@ -36,26 +38,26 @@ SimpleWebAppSourceFile::~SimpleWebAppSourceFile()
 
 int SimpleWebAppSourceFile::read_file()
 {
-    file_content_.clear();
-    if (file_pointer_ == NULL) {
+    file_content.clear();
+    if (file_pointer == NULL) {
         simple_web_app_log::log("error", "simple_web_app_source_file.cpp", "the file netfd is NULL, read file failed");
         return RESULT_ERROR;
     }
-    while(read(file_pointer_, buffer, 1024) == 1024) {
-        file_content_ += buffer;
+    while (read(file_pointer, buffer, 1024) == 1024) {
+        file_content += buffer;
         memset(buffer, 0, 1024);
     }
-    file_content_ += "this is html file";
+    file_content += "this is html file";
     return RESULT_OK;
 }
 
 long SimpleWebAppSourceFile::open_file()
 {
-    if (file_pointer_ != NULL) {
+    if (file_pointer != NULL) {
         simple_web_app_log::log("warning", "simple_web_app_source_file.cpp", "the file has been opened");
         if (close_file() == RESULT_ERROR) return RESULT_ERROR;
     }
-    if ((file_pointer_ = open(file_path_.c_str(), O_CREAT|O_WRONLY|O_TRUNC, 0644)) == NULL) {
+    if ((file_pointer = open(file_path.c_str(), O_CREAT|O_WRONLY|O_TRUNC, 0644)) == NULL) {
         simple_web_app_log::log("error", "simple_web_app_source_file.cpp", "open the file pointer failed");
         return RESULT_ERROR;
     }
@@ -64,9 +66,9 @@ long SimpleWebAppSourceFile::open_file()
 
 long SimpleWebAppSourceFile::close_file()
 {
-    close(file_pointer_);
-    file_pointer_ = NULL;
-    file_pointer_ = NULL;
+    close(file_pointer);
+    file_pointer = NULL;
+    file_pointer = NULL;
     return RESULT_OK;
 }
 
@@ -81,8 +83,7 @@ int SimpleWebAppSourceFile::initialize(std::string source_name, std::string url)
         simple_web_app_log::log("help", "simple_web_app_source_file.cpp", "the source's name is empty");
         return RESULT_ERROR;
     }
-    file_path_ = url;
-    // open the st_neftd
+    file_path = url;
     if (open_file() == RESULT_ERROR) {
         simple_web_app_log::log("error", "simple_web_app_source_file.cpp", "the source open failed");
         return RESULT_ERROR;
@@ -92,8 +93,8 @@ int SimpleWebAppSourceFile::initialize(std::string source_name, std::string url)
 
 int SimpleWebAppSourceFile::get_file_content(std::string& str, long& size)
 {
-    if(read_file() != RESULT_ERROR) {
-        str = file_content_;
+    if (read_file() != RESULT_ERROR) {
+        str = file_content;
     } else {
         simple_web_app_log::log("error", "simple_web_app_source_file.cpp", "the source's name is empyt or read from source failed");
         str = SimpleWebHttp::HTTP_404_RESPONSE_HTML;

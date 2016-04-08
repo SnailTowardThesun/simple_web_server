@@ -30,6 +30,10 @@ SOFTWARE.
 
 static st_netfd_t sig_pipe[2];
 
+std::string get_version()
+{
+    return SIMPLE_WEB_SERVER_NAME;
+}
 
 static void Signal(int sig, void (*handler)(int))
 {

@@ -23,22 +23,19 @@ SOFTWARE.
 */
 #ifndef __SIMPLE_WEB_APP_SOCKET_HEADER__
 #define __SIMPLE_WEB_APP_SOCKET_HEADER__
-#include "../core/simple_web_core.h"
-#include "../core/simple_web_core_buffer.h"
+#include <simple_web_core.h>
+#include <simple_web_core_buffer.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <csignal>
-
 #include <st.h>
+
 namespace SimpleWebSocket
 {
     // using state thread
-    static const int MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET = 5;
-    static const int MAX_LENGHT_FROM_SOCKET = 1024;
-    static const long TIME_OUT_LIMIT = 1000000LL * 30;
     class BaseSocket
     {
     public:
@@ -55,11 +52,11 @@ namespace SimpleWebSocket
         virtual ~TCPServerSock();
     private:
         //int server_socket_;
-        long host_port_;
-        st_netfd_t st_nfd_;
+        long host_port;
+        st_netfd_t st_nfd;
     public:
-        int initialize(std::string ip, long port);
-        st_netfd_t accept_socket();
+        virtual int initialize(std::string ip, long port);
+        virtual st_netfd_t accept_socket();
     };
 
     class HTTPTCPConnSock:BaseSocket,SimpleWebCoreBuffer
@@ -69,13 +66,12 @@ namespace SimpleWebSocket
         HTTPTCPConnSock(st_netfd_t sock);
         virtual ~HTTPTCPConnSock();
     private:
-        st_netfd_t conn_socket_;
+        st_netfd_t conn_socket;
     public:
-        int set_sock(st_netfd_t sock);
-        int close_sock();
-        int initialize(std::string ip, long port);
-        bool get_http_header_message(std::string& message);
-        //bool send_msg(std::string msg, long msg_length);
+        virtual int set_sock(st_netfd_t sock);
+        virtual int close_sock();
+        virtual int initialize(std::string ip, long port);
+        virtual long get_http_header_message(std::string& message);
         virtual int read(std::string buf, int size);
         virtual int write(std::string buf, int size);
     };

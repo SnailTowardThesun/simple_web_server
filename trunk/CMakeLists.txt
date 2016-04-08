@@ -12,6 +12,10 @@ else( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
 
 include_directories("./3rdparty/st-1.9/obj/")
+include_directories("./src/app/")
+include_directories("./src/core/")
+include_directories("./src/kernel/")
+include_directories("./src/protocol/")
 
 SET(APP_SOCKET ./src/app/simple_web_app_socket.cpp)
 SET(APP_CONF ./src/app/simple_web_app_conf.cpp)

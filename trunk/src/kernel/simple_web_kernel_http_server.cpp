@@ -21,10 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_kernel_http_server.h"
-#include "../protocol/simple_web_protocol_http.h"
+#include <simple_web_kernel_http_server.h>
+#include <simple_web_protocol_http.h>
 #include <fstream>
 
+#define DEFAULT_HTTP_SERVER_PORT 8080
 SimpleWebKernelHttpServer::SimpleWebKernelHttpServer()
 {
 }
@@ -65,7 +66,7 @@ long SimpleWebKernelHttpServer::thread_func(void* arg)
     std::string request_str;
     SimpleWebSocket::HTTPTCPConnSock* conn_sock = (SimpleWebSocket::HTTPTCPConnSock*)arg;
     SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
-    if (conn_sock->get_http_header_message(request_str)) {
+    if (conn_sock->get_http_header_message(request_str) == RESULT_OK) {
         http_decoder.deal_with_request(request_str, conn_sock);
     }
     conn_sock->close_sock();

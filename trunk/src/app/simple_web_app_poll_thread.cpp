@@ -30,6 +30,7 @@ SOFTWARE.
 #include <cerrno>
 #include <fcntl.h>
 #include <cstring>
+#include <cstdio>
 #include "simple_web_app_poll_thread.h"
 #ifdef FOR_DEBUG
 SimpleWebAppPollThread::SimpleWebAppPollThread() : signal_in_class(true),
@@ -145,7 +146,9 @@ long SimpleWebAppPollThread::loop()
         simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "step into while loop");
         int n = epoll_wait(epoll_fd, events, max_event_num, -1);
         if(n == -1) {
-            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll wait failed");
+            char buf[100];
+            sprintf(buf,"epoll wait failed ,the errno = %d", errno);
+            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", buf);
             return RESULT_ERROR;
         }
         for (i = 0; i < n; i++) {

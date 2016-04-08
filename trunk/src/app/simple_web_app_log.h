@@ -24,11 +24,7 @@ SOFTWARE.
 #ifndef __SIMPLE_WEB_APP_LOG_HEADER__
 #define __SIMPLE_WEB_APP_LOG_HEADER__
 
-#include "../core/simple_web_core.h"
-#include <stdio.h>
-#include <stdarg.h>
-#define DEFAULT_SIMPLE_WEB_LOG_FILE "simple_web.log"
-#define LOG_MAX_SIZE 4096
+#include <simple_web_core.h>
 
 class simple_web_app_log
 {

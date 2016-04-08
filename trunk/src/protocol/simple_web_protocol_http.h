@@ -25,10 +25,10 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_PROTOCOL_HTTP_H
 #define SIMPLE_WEB_PROTOCOL_HTTP_H
 
-#include "../core/simple_web_core.h"
-#include "../core/simple_web_core_buffer.h"
-#include "../core/simple_web_core_source.h"
-#include "../app/simple_web_app_socket.h"
+#include <simple_web_core.h>
+#include <simple_web_core_buffer.h>
+#include <simple_web_core_source.h>
+#include <simple_web_app_socket.h>
 namespace SimpleWebHttp
 {
     class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
@@ -37,12 +37,12 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttpRequest();
         virtual ~SimpleWebProtocolHttpRequest();
     private:
-        std::map<std::string,std::string> http_request_map_;
+        std::map<std::string,std::string> http_request_map;
     protected:
-        bool get_http_request_parts(std::vector<std::string>);
+        virtual long get_http_request_parts(std::vector<std::string>);
     public:
-        bool parse_http_request(std::string request);
-        std::string get_info(std::string name);
+        virtual long parse_http_request(std::string request);
+        virtual std::string get_info(std::string name);
     };
 
     class SimpleWebProtocolHttpResponse:SimpleWebCoreBuffer
@@ -51,13 +51,13 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttpResponse();
         virtual ~SimpleWebProtocolHttpResponse();
     private:
-        std::map<std::string ,std::string> http_response_map_;
+        std::map<std::string ,std::string> http_response_map;
     protected:
         std::vector<std::string> combine_http_response(std::map<std::string,std::string>);
     public:
-        bool parse_http_response(std::string response);
-        void set_info(std::string name, std::string content);
-        std::string get_http_response();
+        virtual long parse_http_response(std::string response);
+        virtual long set_info(std::string name, std::string content);
+        virtual std::string get_http_response();
     };
 
     class SimpleWebProtocolHttp
@@ -66,11 +66,11 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttp();
         virtual ~SimpleWebProtocolHttp();
     private:
-        SimpleWebProtocolHttpRequest request_;
-        SimpleWebProtocolHttpResponse response_;
+        SimpleWebProtocolHttpRequest request;
+        SimpleWebProtocolHttpResponse response;
     public:
-        bool  deal_with_request(std::string request, SimpleWebSocket::HTTPTCPConnSock* sock);
-        bool deal_with_response(std::string response);
+        virtual long deal_with_request(std::string request, SimpleWebSocket::HTTPTCPConnSock* sock);
+        virtual long  deal_with_response(std::string response);
     };
 }
 
