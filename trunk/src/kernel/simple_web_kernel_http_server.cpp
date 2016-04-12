@@ -36,17 +36,20 @@ SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 
 int SimpleWebKernelHttpServer::initialize(std::string ip, long port = DEFAULT_HTTP_SERVER_PORT)
 {
+#ifdef USING_ST
     // initialize the socket
     if (srv_sock_.initialize(ip,port) == RESULT_ERROR) {
         simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
         return RESULT_ERROR;
     }
+#endif
     return RESULT_OK;
 }
 
 int SimpleWebKernelHttpServer::loop()
 {
     int ret = RESULT_OK;
+#ifdef USING_ST
     while (1) {
         st_netfd_t sock_client = srv_sock_.accept_socket();
         if (sock_client == NULL) {
@@ -58,6 +61,7 @@ int SimpleWebKernelHttpServer::loop()
         conn_sock->set_sock(sock_client);
         start((void*)conn_sock);
     }
+#endif
     return ret;
 }
 

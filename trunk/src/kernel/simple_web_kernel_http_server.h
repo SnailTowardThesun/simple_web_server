@@ -26,11 +26,10 @@ SOFTWARE.
 
 #include <simple_web_core.h>
 #include <simple_web_app_socket.h>
-
+#include <simple_web_app_thread.h>
 
 #ifdef USING_ST
 #include <st.h>
-#include <simple_web_app_thread.h>
 #else
 #include <pthread.h>
 #endif

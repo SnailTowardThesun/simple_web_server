@@ -42,7 +42,10 @@ int main(int argc,char** argv)
     return http_server.loop();
 #else
     SimpleWebAppPollThread th;
-    th.initialize();
-    return th.loop();
+    if (th.initialize() == RESULT_ERROR) {
+        simple_web_app_log::log("error","simple_web_server.cpp","poll thread initialize failed");
+        return RESULT_ERROR;
+    }
+    return (int)th.loop();
 #endif
 }
