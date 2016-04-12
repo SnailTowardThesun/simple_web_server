@@ -21,10 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_kernel_http_server.h"
-#include "../protocol/simple_web_protocol_http.h"
+#include <simple_web_kernel_http_server.h>
+#include <simple_web_protocol_http.h>
 #include <fstream>
 
+#define DEFAULT_HTTP_SERVER_PORT 8080
 SimpleWebKernelHttpServer::SimpleWebKernelHttpServer()
 {
 }
@@ -35,17 +36,20 @@ SimpleWebKernelHttpServer::~SimpleWebKernelHttpServer()
 
 int SimpleWebKernelHttpServer::initialize(std::string ip, long port = DEFAULT_HTTP_SERVER_PORT)
 {
+#ifdef USING_ST
     // initialize the socket
     if (srv_sock_.initialize(ip,port) == RESULT_ERROR) {
         simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
         return RESULT_ERROR;
     }
+#endif
     return RESULT_OK;
 }
 
 int SimpleWebKernelHttpServer::loop()
 {
     int ret = RESULT_OK;
+#ifdef USING_ST
     while (1) {
         st_netfd_t sock_client = srv_sock_.accept_socket();
         if (sock_client == NULL) {
@@ -57,6 +61,7 @@ int SimpleWebKernelHttpServer::loop()
         conn_sock->set_sock(sock_client);
         start((void*)conn_sock);
     }
+#endif
     return ret;
 }
 
@@ -65,7 +70,7 @@ long SimpleWebKernelHttpServer::thread_func(void* arg)
     std::string request_str;
     SimpleWebSocket::HTTPTCPConnSock* conn_sock = (SimpleWebSocket::HTTPTCPConnSock*)arg;
     SimpleWebHttp::SimpleWebProtocolHttp http_decoder;
-    if (conn_sock->get_http_header_message(request_str)) {
+    if (conn_sock->get_http_header_message(request_str) == RESULT_OK) {
         http_decoder.deal_with_request(request_str, conn_sock);
     }
     conn_sock->close_sock();

@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_KERNEL_SOURCES_H
 #define SIMPLE_WEB_KERNEL_SOURCES_H
 
-#include "../core/simple_web_core.h"
+#include <simple_web_core.h>
 
 class SimpleWebCoreSource;
 // this is a static class
@@ -36,12 +36,12 @@ public:
     SimpleWebKernelSourcesCtl();
     virtual ~SimpleWebKernelSourcesCtl();
 private:
-    static SimpleWebKernelSourcesCtl*  pInstance_;
+    static SimpleWebKernelSourcesCtl*  pInstance;
 public:
     static SimpleWebKernelSourcesCtl* getInstance();
 private:
-    std::map<std::string,SimpleWebCoreSource*> source_list_;
-    std::string current_path_;
+    std::map<std::string,SimpleWebCoreSource*> source_list;
+    std::string current_path;
 public:
     long initialize(std::string base_folder_path);
     SimpleWebCoreSource* get_source(std::string file_url);

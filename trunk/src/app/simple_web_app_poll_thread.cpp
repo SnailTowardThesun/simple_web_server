@@ -29,8 +29,9 @@ SOFTWARE.
 #include <netdb.h>
 #include <cerrno>
 #include <fcntl.h>
-#include <cstring>
-#include "simple_web_app_poll_thread.h"
+#include <cstdio>
+#include <simple_web_app_poll_thread.h>
+#include <string.h>
 #ifdef FOR_DEBUG
 SimpleWebAppPollThread::SimpleWebAppPollThread() : signal_in_class(true),
                                                    epoll_fd(NULL),
@@ -64,22 +65,24 @@ long SimpleWebAppPollThread::create_socket_bind()
         simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "create socket failed");
         return RESULT_ERROR;
     }
-    struct sockaddr_in name;
-    unsigned short host_port_ = default_port;
-    name.sin_family = AF_INET;
-    name.sin_port = htons(host_port_);
-    name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
-    // bind the socket
-    if(bind(listen_socket_fd,(const sockaddr*)&name,sizeof(name)) < 0) {
-        simple_web_app_log::log("error","simple_web_app_poll_thread.cpp","fail to bind the socket");
-        return RESULT_ERROR;
-    }
     // make socket no block
     if (make_socket_non_blocking(listen_socket_fd) == RESULT_ERROR) {
         simple_web_app_log::log("error", "simpel_web_app_poll_thread.cpp"
                 , "make socket no block failed");
         return RESULT_ERROR;
     }
+    struct sockaddr_in name;
+    unsigned short host_port_ = default_port;
+    name.sin_family = AF_INET;
+    name.sin_port = htons(host_port_);
+    name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
+
+    // bind the socket
+    if(bind(listen_socket_fd,(const sockaddr*)&name,sizeof(name)) < 0) {
+        simple_web_app_log::log("error","simple_web_app_poll_thread.cpp","fail to bind the socket");
+        return RESULT_ERROR;
+    }
+
     // begin to listen and set the default queue at 100;
     if(listen(listen_socket_fd, 100) < 0) {
         simple_web_app_log::log("error", "simple_web_app_socket.cpp", "fail to listen");
@@ -90,7 +93,7 @@ long SimpleWebAppPollThread::create_socket_bind()
 }
 
 long SimpleWebAppPollThread::make_socket_non_blocking(int infd)
-{    
+{
     int flags, s;
     flags = fcntl(infd, F_GETFL, 0);
     if (flags == -1) {
@@ -131,7 +134,7 @@ long SimpleWebAppPollThread::initialize()
         delete events;
         events = NULL;
     }
-    events = (epoll_event*)malloc(sizeof(epoll_event) * max_event_num);
+    events = calloc(max_event_num, sizeof event);
 
     return RESULT_OK;
 }
@@ -139,63 +142,64 @@ long SimpleWebAppPollThread::initialize()
 long SimpleWebAppPollThread::loop()
 {
     long ret = RESULT_OK;
-    while(signal_in_class) {
+    while (signal_in_class) {
         // loop to get the epoll singnal
         int i = 0;
         simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "step into while loop");
         int n = epoll_wait(epoll_fd, events, max_event_num, -1);
-        if(n == -1) {
-            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll wait failed");
+        if (n < 0 && errno != EINTR) {
+            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll wait failed ,the errno = %d", errno);
             return RESULT_ERROR;
         }
         for (i = 0; i < n; i++) {
-            std::cout<<"n is "<<n<<" i is "<<i<<std::endl;
             if((events[i].events & EPOLLERR)
                || (events[i].events & EPOLLHUP)
                || !(events[i].events & EPOLLIN)) {
                 simple_web_app_log::log("error", "smple_web_app_poll_thread.cpp"
                         , "epoll failed");
                 close(events[i].data.fd);
-                break;
+                continue;
             }
             if (listen_socket_fd == events[i].data.fd) {
-                struct sockaddr in_addr;
-                socklen_t in_len;
-                int infd;
-                char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
-                in_len = sizeof in_addr;
-                infd = accept(listen_socket_fd, &in_addr, &in_len);
-                if (infd == -1) {
-                    if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
-                        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp"
-                                , "the errno is EAGAIN when accepting the socket");
-                        break;
+                while (1) {
+                    struct sockaddr in_addr;
+                    socklen_t in_len;
+                    int infd;
+                    char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+                    in_len = sizeof in_addr;
+                    infd = accept(listen_socket_fd, &in_addr, &in_len);
+                    if (infd == -1) {
+                        if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+                            simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp"
+                                    , "the errno is EAGAIN when accepting the socket");
+                            break;
+                        }
+                        else {
+                            simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp"
+                                    , "accept socket failed");
+                            break;
+                        }
                     }
-                    else {
-                        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp"
-                                , "accept socket failed");
-                        break;
+
+                    int s = getnameinfo(&in_addr, in_len, hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
+                    if (s == 0) {
+                        printf("Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
                     }
+
+                    s = (int) make_socket_non_blocking(infd);
+                    if (s == -1) {
+                        abort();
+                    }
+                    event.data.fd = infd;
+                    event.events = EPOLLIN | EPOLLET;
+                    s = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, infd, &event);
+                    if (s == -1) {
+                        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll ctl failed");
+                        abort();
+                    }
+                    simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in accepting one socket");
                 }
 
-                int s = getnameinfo(&in_addr, in_len, hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
-                if (s == 0) {
-                    printf("Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
-                }
-
-                s = (int) make_socket_non_blocking(infd);
-                if (s == -1) {
-                    abort();
-                }
-
-                event.data.fd = infd;
-                event.events = EPOLLIN | EPOLLET;
-                s = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, infd, &event);
-                if (s == -1) {
-                    simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "epoll ctl failed");
-                    abort();
-                }
-                simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in accepting one socket");
             } else {
                 do_with_fd(events[i].data.fd);
             }
@@ -208,7 +212,7 @@ long SimpleWebAppPollThread::do_with_fd(int fd)
 {
     int done = 0;
     while (1) {
-        char buf[512];
+        char buf[1024];
         ssize_t count = read(fd, buf, sizeof buf);
         if (count == -1) {
             if(errno != EAGAIN) {
@@ -229,11 +233,10 @@ long SimpleWebAppPollThread::do_with_fd(int fd)
             perror("write");
             abort();
         }
-        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in dealing one connection");
     }
-    if (done == 1) {
-        printf("Closed connection on descriptor %d\n", fd);
+    if (done) {
         close(fd);
     }
+    simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp", "successed in dealing one connection");
     return RESULT_OK;
 }

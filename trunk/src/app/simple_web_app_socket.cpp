@@ -21,8 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_app_socket.h"
+#include <simple_web_app_socket.h>
 using namespace SimpleWebSocket;
+
+#define MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET 5
+#define TIME_OUT_LIMIT 1000000LL * 30
 
 BaseSocket::BaseSocket()
 {
@@ -34,8 +37,8 @@ BaseSocket::~BaseSocket()
 
 }
 
-TCPServerSock::TCPServerSock() : host_port_(0),
-    st_nfd_(NULL)
+TCPServerSock::TCPServerSock() : host_port(0),
+    st_nfd(NULL)
 {
 
 }
@@ -47,42 +50,42 @@ TCPServerSock::~TCPServerSock()
 
 int TCPServerSock::initialize(std::string ip, long port)
 {
-    if(port < 1) {
-        simple_web_app_log::log("help","simple_web_app_socket.cpp","the port is illegal");
+    if (port < 1) {
+        simple_web_app_log::log("help", "simple_web_app_socket.cpp", "the port is illegal");
         return RESULT_ERROR;
     }
-    if(!ip.empty()){
-        simple_web_app_log::log("trace","simple_web_app_socket.cpp","the ip is not empty");
+    if (!ip.empty()){
+        simple_web_app_log::log("trace", "simple_web_app_socket.cpp", "the ip is not empty");
     }
-    host_port_ = port;
+    host_port = port;
 
     // initialize the socket
-    int server_socket_ = socket(AF_INET,SOCK_STREAM,0);
-    if(server_socket_ == -1) {
-        simple_web_app_log::log("error","simple_web_app_sock.cpp","fail to initialize the server socket");
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1) {
+        simple_web_app_log::log("error", "simple_web_app_sock.cpp", "fail to initialize the server socket");
         return RESULT_ERROR;
     }
     // local addr
     struct sockaddr_in name;
     name.sin_family = AF_INET;
-    name.sin_port = htons(host_port_);
+    name.sin_port = htons((uint16_t)host_port);
     name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
     // bind the socket
-    if(bind(server_socket_,(const sockaddr*)&name,sizeof(name)) < 0) {
-        simple_web_app_log::log("error","simple_web_add_sock.cpp","fail to bind the socket");
+    if (bind(server_socket, (const sockaddr*)&name, sizeof(name)) < 0) {
+        simple_web_app_log::log("error", "simple_web_add_sock.cpp", "fail to bind the socket");
         return RESULT_ERROR;
     }
     // begin to listen
-    if(listen(server_socket_, MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET) < 0) {
-        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to listen");
+    if (listen(server_socket, MAX_LENGTH_TO_QUEUE_OF_LISTEN_SOCKET) < 0) {
+        simple_web_app_log::log("error", "simple_web_app_socket.cpp", "fail to listen");
         return RESULT_ERROR;
     }
-    if ((st_nfd_ = st_netfd_open(server_socket_)) == NULL) {
-        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to open st netfd");
+    if ((st_nfd = st_netfd_open(server_socket)) == NULL) {
+        simple_web_app_log::log("error", "simple_web_app_socket.cpp", "fail to open st netfd");
         return RESULT_ERROR;
     }
-    if (st_netfd_serialize_accept(st_nfd_) < 0) {
-        simple_web_app_log::log("error","simple_web_app_socket.cpp","fail to accept");
+    if (st_netfd_serialize_accept(st_nfd) < 0) {
+        simple_web_app_log::log("error", "simple_web_app_socket.cpp", "fail to accept");
         return RESULT_ERROR;
     }
     return RESULT_OK;
@@ -92,113 +95,100 @@ st_netfd_t TCPServerSock::accept_socket()
 {
     struct sockaddr_in client_name;
     int client_name_len = sizeof(client_name);
-    st_netfd_t conn_socket = st_accept(st_nfd_, (struct sockaddr *)&client_name, &client_name_len, ST_UTIME_NO_TIMEOUT);
+    st_netfd_t conn_socket = st_accept(st_nfd, (struct sockaddr *)&client_name, &client_name_len, ST_UTIME_NO_TIMEOUT);
     return conn_socket;
 }
 
-HTTPTCPConnSock::HTTPTCPConnSock():conn_socket_(NULL)
+HTTPTCPConnSock::HTTPTCPConnSock():conn_socket(NULL)
 {
 
 }
 
-HTTPTCPConnSock::HTTPTCPConnSock(st_netfd_t sock):conn_socket_(sock)
+HTTPTCPConnSock::HTTPTCPConnSock(st_netfd_t sock):conn_socket(sock)
 {
 
 }
 
 int HTTPTCPConnSock::set_sock(st_netfd_t sock)
 {
-   if (conn_socket_ != NULL) {
-       st_netfd_close(conn_socket_);
+   if (conn_socket != NULL) {
+       st_netfd_close(conn_socket);
    }
-    conn_socket_ = sock;
+    conn_socket = sock;
     return RESULT_OK;
 }
 
 int HTTPTCPConnSock::close_sock()
 {
-    if(conn_socket_ != NULL) {
-        st_netfd_close(conn_socket_);
-        conn_socket_ = NULL;
+    if(conn_socket != NULL) {
+        st_netfd_close(conn_socket);
+        conn_socket = NULL;
     }
     return RESULT_OK;
 }
 
 HTTPTCPConnSock::~HTTPTCPConnSock()
 {
-    if (conn_socket_ != NULL)
-        st_netfd_close(conn_socket_);
+    if (conn_socket != NULL)
+        st_netfd_close(conn_socket);
 }
 
 int HTTPTCPConnSock::initialize(std::string ip, long port)
 {
     if(!ip.empty()){
-        simple_web_app_log::log("trace","simple_web_app_socket.cpp","the ip is not empty");
+        simple_web_app_log::log("trace", "simple_web_app_socket.cpp", "the ip is not empty");
     }
     if(port < 1) {
-        simple_web_app_log::log("help","simple_web_app_sokcet.cpp","the port is illegal");
+        simple_web_app_log::log("help", "simple_web_app_sokcet.cpp", "the port is illegal");
         return RESULT_ERROR;
     }
     return RESULT_OK;
 }
 
-bool HTTPTCPConnSock::get_http_header_message(std::string& message)
+long HTTPTCPConnSock::get_http_header_message(std::string& message)
 {
+    long ret = RESULT_OK;
     message.clear();
-    buffer_.clear();
+    buffer.clear();
     // end with \r\n\r\n
     bool isEnd = false;
     char c = '\0';
-    while(!isEnd) {
-        if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
-        buffer_ += c;
+    while (!isEnd) {
+        if (st_read(conn_socket, &c, 1, TIME_OUT_LIMIT) == 0) {
+            break;
+        }
+        buffer += c;
         // if got \n
-        if(c == '\r') {
-            if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
-            buffer_ += c;
-            if(c == '\n') {
-                if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
-                buffer_ += c;
-                if(c == '\r') {
-                    if(st_read(conn_socket_,&c,1,TIME_OUT_LIMIT) == 0) break;
-                    buffer_ += c;
-                    if(c == '\n') {
-                        buffer_ += c;
+        if (c == '\r') {
+            if (st_read(conn_socket, &c, 1, TIME_OUT_LIMIT) == 0) {
+                break;
+            }
+            buffer += c;
+            if (c == '\n') {
+                if (st_read(conn_socket, &c, 1, TIME_OUT_LIMIT) == 0) {
+                    break;
+                }
+                buffer += c;
+                if (c == '\r') {
+                    if (st_read(conn_socket, &c, 1, TIME_OUT_LIMIT) == 0) {
+                        break;
+                    }
+                    buffer += c;
+                    if (c == '\n') {
+                        buffer += c;
                         isEnd = true;
                     }
                 }
             }
         }
     }
-    message = buffer_;
+    message = buffer;
     // delete the '\0'
-    message.erase(0,message.find_first_not_of('\0'));
-    message.erase(message.find_last_not_of('\0')+1);
-    return (!message.empty());
+    message.erase(0, message.find_first_not_of('\0'));
+    message.erase(message.find_last_not_of('\0') + 1);
+    return (ret = message.empty() ? RESULT_ERROR : RESULT_OK);
 }
-/*
-bool HTTPTCPConnSock::send_msg(std::string msg, long msg_length)
-{
-    if(msg.length() < (size_t)msg_length) {
-        simple_web_app_log::log("help", "simple_web_app_socket.cpp",
-                                "the length of message to be sended is short than the required");
-        return false;
-    }
-    size_t msg_left = (size_t)msg_length, msg_sended_size = 0, msg_to_send_size = 0;
-    std::string msg_to_send;
-    while(msg_left > 0) {
-        msg_to_send_size = msg_left < MAX_LENGHT_FROM_SOCKET ? msg_left :MAX_LENGHT_FROM_SOCKET;
-        msg_to_send.assign(msg,msg_length - msg_sended_size, msg_to_send_size);
-        if((msg_sended_size = send(conn_socket_,msg.c_str(),msg_to_send_size,0)) == 0) {
-            simple_web_app_log::log("error", "simple_web_app_socket.cpp",
-                                    "fail to send one package");
-            return false;
-        }
-        msg_left -= msg_sended_size;
-    }
-    return true;
-}
-*/
+
 int HTTPTCPConnSock::read(std::string buf, int size)
 {
     int ret = 0;
@@ -207,5 +197,5 @@ int HTTPTCPConnSock::read(std::string buf, int size)
 
 int HTTPTCPConnSock::write(std::string buf, int size)
 {
-    return st_write(conn_socket_, buf.c_str(), size, ST_UTIME_NO_TIMEOUT);
+    return st_write(conn_socket, buf.c_str(), size, ST_UTIME_NO_TIMEOUT);
 }

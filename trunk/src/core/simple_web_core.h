@@ -24,20 +24,22 @@ SOFTWARE.
 #ifndef __SIMPLE_WEB_CORE_HEADER__
 #define __SIMPLE_WEB_CORE_HEADER__
 
-#define SIMPLE_WEB_VERSION "2016-02-21-1.0"
 // common header
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
-#include "../app/simple_web_app_log.h"
-static const std::string  SIMPLE_WEB_SERVER_NAME = "Simple_Web_Server_1,0";
+#include <simple_web_app_log.h>
+#define SIMPLE_WEB_SERVER_NAME "Simple_Web_Server_1,0"
+
 // common veriable
-static const long RESULT_OK = 0;
-static const long RESULT_ERROR = 1;
+#define RESULT_OK 0
+#define RESULT_ERROR 1
+
 // common function
 extern long simple_web_initialize(std::string base_folder_path);
 extern void *process_signals(void *arg);
+extern std::string get_version();
 
 //compile switch
 #define USING_ST

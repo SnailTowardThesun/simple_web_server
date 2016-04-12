@@ -24,24 +24,22 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_APP_SOURCE_FILE_H
 #define SIMPLE_WEB_APP_SOURCE_FILE_H
 
-#include "../core/simple_web_core.h"
-#include "../core/simple_web_core_source.h"
-#include <st.h>
+#include <simple_web_core.h>
+#include <simple_web_core_source.h>
 class SimpleWebAppSourceFile:public SimpleWebCoreSource
 {
 public:
     SimpleWebAppSourceFile();
     virtual ~SimpleWebAppSourceFile();
 private:
-    std::string file_path_;
-    st_netfd_t file_netfd_;
-    int file_pointer_;
+    std::string file_path;
+    int file_pointer;
     char buffer[1024];
-    std::string file_content_;
+    std::string file_content;
 protected:
-    int read_file();
-    long open_file();
-    long close_file();
+    virtual int read_file();
+    virtual long open_file();
+    virtual long close_file();
 public:
     virtual int initialize(std::string source_name, std::string url);
     virtual int get_file_content(std::string& str, long& size);

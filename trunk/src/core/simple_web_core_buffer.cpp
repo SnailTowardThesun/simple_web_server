@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "simple_web_core_buffer.h"
+#include <simple_web_core_buffer.h>
 
 SimpleWebCoreBuffer::SimpleWebCoreBuffer()
 {
@@ -39,7 +39,7 @@ bool SimpleWebCoreBuffer::write_into_buffer(const char* data, int data_size)
         simple_web_app_log::log("help","SimpleWebCoreBuffer.cpp","the data is NULL");
         return false;
     }
-    buffer_.append(data,data_size);
+    buffer.append(data, (unsigned long) data_size);
     return true;
 }
 

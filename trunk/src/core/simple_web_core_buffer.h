@@ -25,16 +25,16 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_CORE_BUFFER_H
 #define SIMPLE_WEB_CORE_BUFFER_H
 
-#include "simple_web_core.h"
+#include <simple_web_core.h>
 class SimpleWebCoreBuffer
 {
 public:
     SimpleWebCoreBuffer();
     virtual ~SimpleWebCoreBuffer();
 public:
-    std::string buffer_;
-    bool write_into_buffer(const char* data, int data_size);
-    std::vector<std::string> get_lines(std::string str);
-    std::string set_line(std::vector<std::string> vec);
+    std::string buffer;
+    virtual bool write_into_buffer(const char* data, int data_size);
+    virtual std::vector<std::string> get_lines(std::string str);
+    virtual std::string set_line(std::vector<std::string> vec);
 };
 #endif

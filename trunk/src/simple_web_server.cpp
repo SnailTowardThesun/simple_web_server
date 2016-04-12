@@ -21,9 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "core/simple_web_core.h"
-#include "kernel/simple_web_kernel_http_server.h"
-#include "app/simple_web_app_poll_thread.h"
+#include <simple_web_core.h>
+#ifdef USING_ST
+#include <simple_web_kernel_http_server.h>
+#else
+#include <simple_web_app_poll_thread.h>
+#endif
+
 int main(int argc,char** argv)
 {
     // initialize the global varibales
@@ -31,13 +35,17 @@ int main(int argc,char** argv)
         simple_web_app_log::log("error","simple_web_server.cpp","fail to initialize the SourceCtl part");
         return -1;
     }
-    SimpleWebAppPollThread th;
-    th.initialize();
-    return th.loop();
-    /*
+#ifdef USING_ST
     // start a http server
     SimpleWebKernelHttpServer http_server;
-    if(http_server.initialize("",9090) == RESULT_ERROR) return -1;
+    if(http_server.initialize("",8080) == RESULT_ERROR) return -1;
     return http_server.loop();
-     */
+#else
+    SimpleWebAppPollThread th;
+    if (th.initialize() == RESULT_ERROR) {
+        simple_web_app_log::log("error","simple_web_server.cpp","poll thread initialize failed");
+        return RESULT_ERROR;
+    }
+    return (int)th.loop();
+#endif
 }
