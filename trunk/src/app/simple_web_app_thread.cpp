@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <simple_web_app_thread.h>
+#include <cstdlib>
 
 SimpleWebAppThread::SimpleWebAppThread()
 {
@@ -69,6 +70,6 @@ void* SimpleWebAppThread::thread_cycle(void* param) {
     SimpleWebAppThread *pC = (SimpleWebAppThread *) pArg->pThis;
     pC->thread_func(pArg->pParam);
     simple_web_app_log::log("trace", "simple_web_app_thread.cpp", "ready to exit trehad");
-    delete param;
+    free(param);
     return NULL;
 }
