@@ -43,8 +43,8 @@ private:
     std::map<std::string,SimpleWebCoreSource*> source_list;
     std::string current_path;
 public:
-    long initialize(std::string base_folder_path);
-    SimpleWebCoreSource* get_source(std::string file_url);
+    virtual long initialize(std::string base_folder_path);
+    virtual SimpleWebCoreSource* get_source(std::string file_url);
 };
 
 #endif

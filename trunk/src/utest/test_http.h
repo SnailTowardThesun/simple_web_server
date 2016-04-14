@@ -27,7 +27,7 @@ SOFTWARE.
 #include <cppunit/extensions/HelperMacros.h>
 #include "../protocol/simple_web_protocol_http.h"
 
-class TestHttp:public CppUnit::TestFixture
+class TestHttp : public CppUnit::TestFixture
 {
     // unit test for http protocol
     CPPUNIT_TEST_SUITE(TestHttp);

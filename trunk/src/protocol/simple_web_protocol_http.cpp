@@ -51,19 +51,19 @@ long SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
         return RESULT_ERROR;
     }
     http_request_map.clear();
-    std::string show_message;
+
     for(std::vector<std::string>::iterator it = http_header_list.begin(); it != http_header_list.end(); it++) {
         std::string header_name, header_content;
+
         size_t size = it->find_first_of(" ");
         if(size == std::string::npos) {
             return RESULT_ERROR;
         }
+
         header_name.assign(*it, 0, size);
         if(is_http_method(header_name)) {
             // add method name
             http_request_map.insert(std::pair<std::string, std::string>(HTTP_METHOD, header_name));
-
-            show_message = "get method name "+header_name;
 
             // add the file asked
             size_t cur_size = it->find_first_of(" ", size + 1);
@@ -72,19 +72,13 @@ long SimpleWebProtocolHttpRequest::get_http_request_parts(std::vector<std::strin
             }
 
             header_content.assign(*it, size+1, cur_size - size -1);
-            show_message = "get file " + header_content;
             http_request_map.insert(std::pair<std::string, std::string>(HTTP_REQUEST_FILE, header_content));
             header_content.assign(*it, cur_size+1, it->length() - cur_size - 1);
-            show_message = "get http version  " + header_content;
 
             http_request_map.insert(std::pair<std::string, std::string>(HTTP_VERSION, header_content));
         } else {
             header_name.assign(*it, 0, size);
             header_content.assign(*it, size+1, it->length()-size-1);
-
-            show_message = "get name " + header_name;
-            show_message = "get content " + header_content;
-
             http_request_map.insert(std::pair<std::string, std::string>(header_name, header_content));
         }
     }

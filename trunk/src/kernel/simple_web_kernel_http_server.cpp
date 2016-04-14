@@ -38,8 +38,8 @@ int SimpleWebKernelHttpServer::initialize(std::string ip, long port = DEFAULT_HT
 {
 #ifdef USING_ST
     // initialize the socket
-    if (srv_sock_.initialize(ip,port) == RESULT_ERROR) {
-        simple_web_app_log::log("error","simple_web_kernel_http_server.cpp","fail to initialize socket");
+    if (srv_sock_.initialize(ip, port) == RESULT_ERROR) {
+        simple_web_app_log::log("error", "simple_web_kernel_http_server.cpp", "fail to initialize socket");
         return RESULT_ERROR;
     }
 #endif

@@ -28,22 +28,24 @@ SOFTWARE.
 #include <simple_web_app_poll_thread.h>
 #endif
 
-int main(int argc,char** argv)
+int main(int argc, char** argv)
 {
     // initialize the global varibales
     if (simple_web_initialize("/home/hankun/github/simple_web_server/trunk/objs/www") != RESULT_OK) {
-        simple_web_app_log::log("error","simple_web_server.cpp","fail to initialize the SourceCtl part");
+        simple_web_app_log::log("error", "simple_web_server.cpp", "fail to initialize the SourceCtl part");
         return -1;
     }
 #ifdef USING_ST
     // start a http server
     SimpleWebKernelHttpServer http_server;
-    if(http_server.initialize("",8080) == RESULT_ERROR) return -1;
+    if (http_server.initialize("",8080) == RESULT_ERROR) {
+        return -1;
+    }
     return http_server.loop();
 #else
     SimpleWebAppPollThread th;
     if (th.initialize() == RESULT_ERROR) {
-        simple_web_app_log::log("error","simple_web_server.cpp","poll thread initialize failed");
+        simple_web_app_log::log("error", "simple_web_server.cpp", "poll thread initialize failed");
         return RESULT_ERROR;
     }
     return (int)th.loop();

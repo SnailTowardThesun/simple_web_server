@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef SIMPLE_WEB_PROTOCOL_HTTP_COMMON_VARIABLES_H
 #define SIMPLE_WEB_PROTOCOL_HTTP_COMMON_VARIABLES_H
 
-#include "../core/simple_web_core.h"
+#include <simple_web_core.h>
 
 namespace SimpleWebHttp
 {

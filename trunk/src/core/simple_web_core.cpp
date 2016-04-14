@@ -99,7 +99,6 @@ long simple_web_initialize(std::string base_folder_path)
         simple_web_app_log::log("help", "simple_web_core.cpp", "state thread initialize failed");
         return RESULT_ERROR;
     }
-    std::cout<<"get event's name "<<st_get_eventsys_name()<<std::endl;
     //initialize the signal
     install_sighandlers();
     return RESULT_OK;
@@ -111,8 +110,7 @@ void *process_signals(void *arg)
 
     for ( ; ; ) {
         /* Read the next signal from the signal pipe */
-        if (st_read(sig_pipe[0], &signo, sizeof(int),
-                    ST_UTIME_NO_TIMEOUT) != sizeof(int)) {
+        if (st_read(sig_pipe[0], &signo, sizeof(int), ST_UTIME_NO_TIMEOUT) != sizeof(int)) {
             simple_web_app_log::log("error", "simple_web_core.cpp", "st_read failed");
             exit(0);
         }

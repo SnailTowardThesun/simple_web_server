@@ -120,7 +120,7 @@ int HTTPTCPConnSock::set_sock(st_netfd_t sock)
 
 int HTTPTCPConnSock::close_sock()
 {
-    if(conn_socket != NULL) {
+    if (conn_socket != NULL) {
         st_netfd_close(conn_socket);
         conn_socket = NULL;
     }
@@ -135,10 +135,10 @@ HTTPTCPConnSock::~HTTPTCPConnSock()
 
 int HTTPTCPConnSock::initialize(std::string ip, long port)
 {
-    if(!ip.empty()){
+    if (!ip.empty()){
         simple_web_app_log::log("trace", "simple_web_app_socket.cpp", "the ip is not empty");
     }
-    if(port < 1) {
+    if (port < 1) {
         simple_web_app_log::log("help", "simple_web_app_sokcet.cpp", "the port is illegal");
         return RESULT_ERROR;
     }

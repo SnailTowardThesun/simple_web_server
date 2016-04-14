@@ -34,7 +34,7 @@ SOFTWARE.
 #include <string.h>
 #ifdef FOR_DEBUG
 SimpleWebAppPollThread::SimpleWebAppPollThread() : signal_in_class(true),
-                                                   epoll_fd(NULL),
+                                                   epoll_fd(0),
                                                    events(NULL)
 #else
 SimpleWebAppPollThread::SimpleWebAppPollThread()
@@ -55,9 +55,8 @@ SimpleWebAppPollThread::~SimpleWebAppPollThread()
 #ifdef FOR_DEBUG
 long SimpleWebAppPollThread::create_socket_bind()
 {
-    if (listen_socket_fd != NULL) {
-        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp"
-                , "the thread is running");
+    if (listen_socket_fd != 0) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "the thread is running");
         return RESULT_ERROR;
     }
     listen_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -67,8 +66,7 @@ long SimpleWebAppPollThread::create_socket_bind()
     }
     // make socket no block
     if (make_socket_non_blocking(listen_socket_fd) == RESULT_ERROR) {
-        simple_web_app_log::log("error", "simpel_web_app_poll_thread.cpp"
-                , "make socket no block failed");
+        simple_web_app_log::log("error", "simpel_web_app_poll_thread.cpp", "make socket no block failed");
         return RESULT_ERROR;
     }
     struct sockaddr_in name;
@@ -78,8 +76,8 @@ long SimpleWebAppPollThread::create_socket_bind()
     name.sin_addr.s_addr = htonl(INADDR_ANY);// the default ip address.
 
     // bind the socket
-    if(bind(listen_socket_fd,(const sockaddr*)&name,sizeof(name)) < 0) {
-        simple_web_app_log::log("error","simple_web_app_poll_thread.cpp","fail to bind the socket");
+    if (bind(listen_socket_fd, (const sockaddr*)&name, sizeof(name)) < 0) {
+        simple_web_app_log::log("error", "simple_web_app_poll_thread.cpp", "fail to bind the socket");
         return RESULT_ERROR;
     }
 
@@ -115,8 +113,7 @@ long SimpleWebAppPollThread::initialize()
 {
     // create the listen socket
     if (create_socket_bind() == RESULT_ERROR) {
-        simple_web_app_log::log("error", "simpel_web_app_epoll_thread.cpp"
-                , "create socket, bind it and listen failed");
+        simple_web_app_log::log("error", "simpel_web_app_epoll_thread.cpp", "create socket, bind it and listen failed");
         return RESULT_ERROR;
     }
     epoll_fd = epoll_create1(0);
@@ -183,7 +180,7 @@ long SimpleWebAppPollThread::loop()
 
                     int s = getnameinfo(&in_addr, in_len, hbuf, sizeof hbuf, sbuf, sizeof sbuf, NI_NUMERICHOST | NI_NUMERICSERV);
                     if (s == 0) {
-                        printf("Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
+                        simple_web_app_log::log("trace", "simple_web_app_poll_thread.cpp","Accepted connection on descriptor %d (host=%s, port=%s)\n", infd, hbuf, sbuf);
                     }
 
                     s = (int) make_socket_non_blocking(infd);
