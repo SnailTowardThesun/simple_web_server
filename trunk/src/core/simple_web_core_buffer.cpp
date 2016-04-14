@@ -36,7 +36,7 @@ SimpleWebCoreBuffer::~SimpleWebCoreBuffer()
 bool SimpleWebCoreBuffer::write_into_buffer(const char* data, int data_size)
 {
     if (data == NULL) {
-        simple_web_app_log::log("help","SimpleWebCoreBuffer.cpp","the data is NULL");
+        simple_web_app_log::log("help", "SimpleWebCoreBuffer.cpp", "the data is NULL");
         return false;
     }
     buffer.append(data, (unsigned long) data_size);
@@ -47,19 +47,19 @@ std::vector<std::string> SimpleWebCoreBuffer::get_lines(std::string str)
 {
     std::vector<std::string> str_list;
     if(str.empty()) {
-        simple_web_app_log::log("help","simple_web_core_buffer.cpp","the str is empty");
+        simple_web_app_log::log("help", "simple_web_core_buffer.cpp", "the str is empty");
         return str_list;
     }
-    size_t size = str.find_last_of("\r\n\r\n"),cur_pos = 0;
+    size_t size = str.find_last_of("\r\n\r\n"), cur_pos = 0;
     if(size == std::string::npos) {
-        simple_web_app_log::log("help","simple_web_core_buffer.cpp","the str is not end with \r\n\r\n");
+        simple_web_app_log::log("help", "simple_web_core_buffer.cpp", "the str is not end with \r\n\r\n");
         return str_list;
     }
     while(cur_pos < size - 2) {
         std::string str_line;
-        size_t size_line = str.find_first_of("\r\n",cur_pos);
+        size_t size_line = str.find_first_of("\r\n", cur_pos);
         if(size_line != std::string::npos && size_line != 0) {
-            str_line.assign(str,cur_pos,size_line - cur_pos);
+            str_line.assign(str, cur_pos, size_line - cur_pos);
             str_list.push_back(str_line);
             cur_pos = size_line + 2;
         } else {
@@ -73,7 +73,7 @@ std::string SimpleWebCoreBuffer::set_line(std::vector<std::string> vec)
 {
     std::string str;
     for(std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); it++) {
-        str+=*it + "\r\n";
+        str += *it + "\r\n";
     }
     str+="\r\n";
     return str;

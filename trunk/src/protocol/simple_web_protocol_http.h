@@ -31,7 +31,7 @@ SOFTWARE.
 #include <simple_web_app_socket.h>
 namespace SimpleWebHttp
 {
-    class SimpleWebProtocolHttpRequest:public SimpleWebCoreBuffer
+    class SimpleWebProtocolHttpRequest : public SimpleWebCoreBuffer
     {
     public:
         SimpleWebProtocolHttpRequest();
@@ -51,9 +51,9 @@ namespace SimpleWebHttp
         SimpleWebProtocolHttpResponse();
         virtual ~SimpleWebProtocolHttpResponse();
     private:
-        std::map<std::string ,std::string> http_response_map;
+        std::map<std::string, std::string> http_response_map;
     protected:
-        std::vector<std::string> combine_http_response(std::map<std::string,std::string>);
+        virtual std::vector<std::string> combine_http_response(std::map<std::string, std::string>);
     public:
         virtual long parse_http_response(std::string response);
         virtual long set_info(std::string name, std::string content);

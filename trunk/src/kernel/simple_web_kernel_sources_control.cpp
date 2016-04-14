@@ -54,7 +54,7 @@ SimpleWebKernelSourcesCtl* SimpleWebKernelSourcesCtl::getInstance()
 SimpleWebCoreSource* SimpleWebKernelSourcesCtl::get_source(std::string file_url)
 {
     if (file_url.empty()) {
-        simple_web_app_log::log("help","simple_web_kernel_sources_control.cpp","the file_url is empty");
+        simple_web_app_log::log("help", "simple_web_kernel_sources_control.cpp", "the file_url is empty");
         return NULL;
     }
     return source_list[file_url];
